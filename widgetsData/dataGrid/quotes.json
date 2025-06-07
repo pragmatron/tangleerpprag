@@ -5,7 +5,7 @@
     "direction": "desc"
   },
   "displayColumn": "name",
-  "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"in\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false}]}",
+  "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"contains\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false}]}",
   "isReactive": true,
   "meta": {
     "addressName": {
@@ -2185,7 +2185,7 @@
       },
       "displayInTab": true,
       "displayTotalValue": false,
-      "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"in\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"status\",\"operator\":\"=\",\"value\":{\"value\":\"-OLEPHkPJX51qpAbhVk8\",\"name\":\"APPROVED\"},\"name\":\"Status\",\"expression\":false,\"hidden\":true}]}",
+      "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"contains\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"status\",\"operator\":\"=\",\"value\":{\"value\":\"-OLEPHkPJX51qpAbhVk8\",\"name\":\"APPROVED\"},\"name\":\"Status\",\"expression\":false,\"hidden\":true}]}",
       "meta": {
         "addressName": {
           "displayName": "Address Name",
@@ -2542,7 +2542,7 @@
       },
       "displayInTab": true,
       "displayTotalValue": false,
-      "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"in\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"status\",\"operator\":\"=\",\"value\":{\"value\":\"-OLEPHkfKgGRiEgL6Uuy\",\"name\":\"LOST\"},\"name\":\"Status\",\"expression\":false,\"hidden\":true}]}",
+      "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"contains\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"status\",\"operator\":\"=\",\"value\":{\"value\":\"-OLEPHkfKgGRiEgL6Uuy\",\"name\":\"LOST\"},\"name\":\"Status\",\"expression\":false,\"hidden\":true}]}",
       "meta": {
         "addressName": {
           "displayName": "Address Name",
@@ -2720,7 +2720,7 @@
       "displayCompact": false,
       "displayInTab": true,
       "displayTotalValue": false,
-      "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"in\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"status\",\"operator\":\"=\",\"value\":{\"value\":\"-OLEPHkCzY6imRIK_IyV\",\"name\":\"OPEN\"},\"name\":\"Status\",\"expression\":false,\"hidden\":true}]}",
+      "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"contains\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"status\",\"operator\":\"=\",\"value\":{\"value\":\"-OLEPHkCzY6imRIK_IyV\",\"name\":\"OPEN\"},\"name\":\"Status\",\"expression\":false,\"hidden\":true}]}",
       "meta": {
         "addressName": {
           "displayName": "Address Name",
@@ -2898,7 +2898,7 @@
       },
       "displayInTab": true,
       "displayTotalValue": false,
-      "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"in\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"status\",\"operator\":\"=\",\"value\":{\"value\":\"-OLEPHkG72UMIJOBniKD\",\"name\":\"SENT\"},\"name\":\"Status\",\"expression\":false,\"hidden\":true}]}",
+      "filterBuilder": "{\"condition\":\"AND\",\"rules\":[{\"andOr\":\"AND\",\"key\":\"name\",\"operator\":\"contains\",\"value\":null,\"name\":\"Quote Number\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"soldToCustomer\",\"operator\":\"contains\",\"value\":null,\"name\":\"Sold To Customer\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"contactName\",\"operator\":\"in\",\"value\":null,\"name\":\"Contact\",\"expression\":false,\"hidden\":false},{\"andOr\":\"AND\",\"key\":\"salesperson\",\"operator\":\"in\",\"value\":null,\"name\":\"Salesperson\",\"expression\":false,\"hidden\":false},{\"andOr\":\"\",\"key\":\"status\",\"operator\":\"=\",\"value\":{\"value\":\"-OLEPHkG72UMIJOBniKD\",\"name\":\"SENT\"},\"name\":\"Status\",\"expression\":false,\"hidden\":true}]}",
       "meta": {
         "addressName": {
           "displayName": "Address Name",

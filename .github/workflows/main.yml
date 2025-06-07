@@ -1,0 +1,12 @@
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  auto_merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto merge PR
+        run: gh pr merge ${{ github.event.pull_request.number }} --merge --admin
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -31,6 +31,7 @@ return async function (rowData) {
         let newLineObj = copyObjectWithoutExcludedProps(line);
         newLineObj.name = 'C' + line.name; // Prefix the cloned quote line's name with "C"
         newLineObj.quote = newQuoteId; // Linking the new line to the cloned quote
+        newLineObj.qtytoMfg = 2; // Set quantity to 2 on cloned quote line
 
         let newLineId = await $dgAddRow('quoteLines', newLineObj); // Add the cloned quote line
 

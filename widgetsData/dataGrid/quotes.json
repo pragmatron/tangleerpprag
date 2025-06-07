@@ -557,7 +557,7 @@
                 "type": "text",
                 "name": "control_3e149392-afa3-11ee-9997-694902a69bce",
                 "fieldName": "control_3e149392-afa3-11ee-9997-694902a69bce",
-                "label": "Quote Number",
+                "label": "QUOTE NUMBER",
                 "order": 0,
                 "defaultValue": "",
                 "value": "",

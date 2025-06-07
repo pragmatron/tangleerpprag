@@ -112,6 +112,13 @@
       "order": 31,
       "type": "number"
     },
+    "netProfitPlusTotal": {
+      "displayName": "Net Profit Plus Total",
+      "invisible": true,
+      "order": 32,
+      "priceFormat": true,
+      "type": "number"
+    },
     "nextEvents": {
       "displayName": "Next Events",
       "invisible": true,
@@ -1406,6 +1413,76 @@
                 "runMassUpdateInClientSide": true
               },
               {
+                "type": "number",
+                "name": "control_7e7010b3-964a-4a2f-bfef-ec57ccac4830",
+                "fieldName": "control_7e7010b3-964a-4a2f-bfef-ec57ccac4830",
+                "label": "Net Profit Plus Total",
+                "order": 0,
+                "defaultValue": "",
+                "value": "",
+                "className": "col-md-2",
+                "useWidthPercentages": false,
+                "widthPercentages": null,
+                "readonly": false,
+                "readonlyCondition": "",
+                "placeholder": "",
+                "required": false,
+                "requiredCondition": "",
+                "isMultiLine": false,
+                "isInteger": false,
+                "decimalPlace": 2,
+                "expression": "Number(rowData.netProfit || 0) + Number(rowData.totalQuoteLinePrice || 0)",
+                "additionalFilter": "",
+                "oneDriveFileId": null,
+                "isTodayValue": false,
+                "isTodayValueCreated": true,
+                "dateFormat": "mm/dd/yy hh:mm p",
+                "timezone": null,
+                "selectedDataGrid": null,
+                "printedFileName": null,
+                "dataFetchDepth": "basic",
+                "buttonLabel": "",
+                "dataForTemplate": null,
+                "selectedOutputDataGrid": null,
+                "templateRowKey": null,
+                "isForDownload": true,
+                "isOneDriveTemplate": false,
+                "selectedOneDriveFile": null,
+                "openInNewTab": true,
+                "attachRecord": false,
+                "isCurrentUser": false,
+                "isCurrentUserOwner": true,
+                "isNowTimeValue": false,
+                "timeFormat": "HH:mm",
+                "isMultiple": false,
+                "isAjax": false,
+                "dataOptions": [],
+                "ajaxDataUrl": "",
+                "isChecked": false,
+                "vif": "",
+                "customCode": "",
+                "invisible": false,
+                "invisibleCondition": "",
+                "invisibleLabel": false,
+                "enableCustomValidation": false,
+                "customValidationRule": "",
+                "customValidationErrorMessage": "",
+                "mask": "",
+                "lookupOpenInModalDisabled": false,
+                "lookUpSearch": null,
+                "editorMode": "javascript",
+                "dataGridAvailableViews": [],
+                "dataGridView": null,
+                "dataGridAddRecordsText": "",
+                "dataGridAddRecordText": "",
+                "skipCrop": false,
+                "disableRoundedStyle": false,
+                "customClassName": "",
+                "propName": "netProfitPlusTotal",
+                "gridId": "quotes",
+                "sum": true
+              },
+              {
                 "type": "lookup",
                 "name": "control_ad363ce0-c99f-11ee-bd74-a9ce0774e6b4",
                 "fieldName": "control_ad363ce0-c99f-11ee-bd74-a9ce0774e6b4",
@@ -2332,6 +2409,11 @@
           "invisible": true,
           "order": 31
         },
+        "netProfitPlusTotal": {
+          "displayName": "Net Profit Plus Total",
+          "invisible": true,
+          "order": 33
+        },
         "nextEvents": {
           "displayName": "Next Events",
           "invisible": true,
@@ -2504,6 +2586,11 @@
           "displayName": "Net Profit Percent",
           "invisible": true,
           "order": 31
+        },
+        "netProfitPlusTotal": {
+          "displayName": "Net Profit Plus Total",
+          "invisible": true,
+          "order": 33
         },
         "nextEvents": {
           "displayName": "Next Events",
@@ -2689,6 +2776,11 @@
           "invisible": true,
           "order": 31
         },
+        "netProfitPlusTotal": {
+          "displayName": "Net Profit Plus Total",
+          "invisible": true,
+          "order": 33
+        },
         "nextEvents": {
           "displayName": "Next Events",
           "invisible": true,
@@ -2867,6 +2959,11 @@
           "invisible": true,
           "order": 31
         },
+        "netProfitPlusTotal": {
+          "displayName": "Net Profit Plus Total",
+          "invisible": true,
+          "order": 33
+        },
         "nextEvents": {
           "displayName": "Next Events",
           "invisible": true,
@@ -3044,6 +3141,11 @@
           "displayName": "Net Profit Percent",
           "invisible": true,
           "order": 31
+        },
+        "netProfitPlusTotal": {
+          "displayName": "Net Profit Plus Total",
+          "invisible": true,
+          "order": 33
         },
         "nextEvents": {
           "displayName": "Next Events",

@@ -1,0 +1,28 @@
+{
+  "classes": "",
+  "container": "-NZQRX59_JisVocwtohx",
+  "gsOptions": {
+    "h": 4,
+    "w": 24,
+    "x": 0,
+    "y": 0
+  },
+  "layout": "b-card",
+  "options": {
+    "addRecordText": "Add Work Order",
+    "availableViews": [
+      "workOrders"
+    ],
+    "disableViewsControl": true,
+    "view": "workOrders"
+  },
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "opportunityLines"
+  },
+  "styles": "",
+  "subtab": "-NZQRNzG4GCl_3_CgC6h",
+  "tab": "-NZl1GT89ekLN8eDvSEE",
+  "title": "",
+  "type": "DataGrid"
+}

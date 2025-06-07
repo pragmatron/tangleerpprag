@@ -1,0 +1,1186 @@
+<template>
+  <div ref="tableContainer">
+    <h3>Parts - Method Materials and Operations Tree</h3>
+
+    <!-- VSelect Component -->
+    <v-select :filterable="false" @search="(query) => (search = query)" style="margin-bottom: 5px;" :options="paginated || []" label="name" v-model="selectedWorkOrder" placeholder="Select a top-level part to render from" @input="buildTree" @open="onOpen" @close="onClose">
+      <template #list-footer>
+        <li v-show="hasNextPage" ref="load" class="loader">
+          Loading more options...
+        </li>
+      </template>
+    </v-select>
+    
+
+    <!-- Expand All button only visible when filtered nodes available -->
+    <b-button size="sm" style="margin: 5px" v-if="filteredNodes" variant="primary" @click="expandAll">Expand All <i class="fa fa-arrow-down" aria-hidden="true"></i></b-button>
+    <b-button size="sm" style="margin: 5px" v-if="filteredNodes" variant="primary" @click="collapseAll">Collapse All <i class="fa fa-arrow-up" aria-hidden="true"></i></i></b-button>
+
+
+    <tree-table v-if="filteredNodes && !retrievingMats" :value="filteredNodes" :expanded-keys="expandedKeys" :resizable-columns="true" showGridlines column-resize-mode="expand">
+      <!--  -->
+      <Column :expander="true" header="" style="width: 100px;">
+        <template #body="slotProps">
+          <b-button variant="light" @click="openRecord(slotProps.node.data)">OPEN</b-button>
+        </template>
+      </Column>
+      <!-- Sequence Column -->
+      <Column field="sequence" header="Sequence" style="width: 100px;">
+        <template #body="slotProps">
+          <span v-if="!isEditing(slotProps.node.data, 'sequence')" :class="{'full-width-span': !slotProps.node.data.sequence && slotProps.node.data.sequence != 0}" @click.stop="enableEditing(slotProps.node.data, 'sequence')">
+            {{ slotProps.node.data.sequence }}
+          </span>
+          <input class="editInput" v-else type="number" v-model="slotProps.node.data.sequence" @blur="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'sequence')" @keyup.enter="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'sequence')" />
+        </template>
+      </Column>
+
+
+      <!-- Parent Part Column -->
+      <Column field="parentPart" header="Parent Part" style="width: 150px;"></Column>
+
+
+      <!-- Type Column -->
+      <Column field="type" header="Type" style="width: 100px;"></Column>
+
+
+
+      <!-- Part Column -->
+      <Column field="part" header="Part" style="width: 100px;"></Column>
+      <!-- Resource Group Column -->
+      <Column field="resourceGroup" header="resourceGroup" style="width: 200px;">
+        <template #body="slotProps">
+          <div :class="{'operation-column-editing': isEditing(slotProps.node.data, 'resourceGroup'), 'resourceGroup-column': !isEditing(slotProps.node.data, 'resourceGroup')}">
+            <span v-if="!isEditing(slotProps.node.data, 'resourceGroup')" class="full-width-span" @click.stop="enableEditing(slotProps.node.data, 'resourceGroup')">
+              {{ slotProps.node.data.resourceGroup || ''}}
+            </span>
+            <multiselect v-else class="editInput" v-model="slotProps.node.data.resourceGroup" :options="resourceGroupOptions" @close="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'resourceGroup')" placeholder="Select an Op" label="resourceGroup" track-by="resourceGroup"></multiselect>
+          </div>
+        </template>
+      </Column>
+      <!-- Description Column -->
+      <Column field="description" header="Description" style="width: 200px;">
+        <template #body="slotProps">
+          <span v-if="!isEditing(slotProps.node.data, 'description')" :class="{'full-width-span': !slotProps.node.data.description}">
+            {{ slotProps.node.data.description }}
+          </span>
+          <input disabled="true" class="editInput" v-else type="text" v-model="slotProps.node.data.description" />
+        </template>
+      </Column>
+      <!-- Operation Column -->
+      <Column field="operation" header="Operation" style="width: 200px;">
+        <template #body="slotProps">
+          <div :class="{'operation-column-editing': isEditing(slotProps.node.data, 'operation'), 'operation-column': !isEditing(slotProps.node.data, 'operation')}">
+            <span v-if="!isEditing(slotProps.node.data, 'operation')" class="full-width-span" @click.stop="enableEditing(slotProps.node.data, 'operation')">
+              {{ slotProps.node.data.operation || ''}}
+            </span>
+            <multiselect v-else class="editInput" v-model="slotProps.node.data.operation" :options="operationOptions" @close="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'operation')" placeholder="Select an Op" label="operation" track-by="operation"></multiselect>
+          </div>
+        </template>
+      </Column>
+      <!-- Setup Column -->
+      <Column field="setup" header="Setup" style="width: 150px;">
+        <template #body="slotProps">
+          <span v-if="slotProps.node.data.type !== 'Operation'">
+            {{ slotProps.node.data.setup }}
+          </span>
+          <span v-else-if="!isEditing(slotProps.node.data, 'setup')" @click.stop="enableEditing(slotProps.node.data, 'setup')" style="display: flex; width: 100%; justify-content: right; padding-right: 5px;">
+            {{ slotProps.node.data.setup }}
+          </span>
+          <input v-else type="number" v-model="slotProps.node.data.setup" @blur="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'setup')" @keyup.enter="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'setup')" class="editInput" />
+        </template>
+      </Column>
+      <!-- Quantity/Runtime Column -->
+      <Column field="qtyRuntime" header="Qty/Runtime" style="width: 150px;">
+        <template #body="slotProps">
+          <span v-if="!isEditing(slotProps.node.data, 'qtyRuntime')" class="full-width-span" style="width: 100%; text-align:right; padding-right: 5px;" @click.stop="enableEditing(slotProps.node.data, 'qtyRuntime')">
+            {{ slotProps.node.data.qtyRuntime }}
+          </span>
+          <input class="editInput" v-else type="number" v-model="slotProps.node.data.qtyRuntime" @blur="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'qtyRuntime')" @keyup.enter="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'qtyRuntime')" />
+        </template>
+      </Column>
+      <!-- UM Column -->
+      <Column field="um" header="UM" style="width: 200px;">
+        <template #body="slotProps">
+          <div :class="{'um-column-editing': isEditing(slotProps.node.data, 'um'), 'um-column': !isEditing(slotProps.node.data, 'um')}">
+            <span v-if="!isEditing(slotProps.node.data, 'um')" class="full-width-span" @click.stop="enableEditing(slotProps.node.data, 'um')">
+              {{ slotProps.node.data.um.um || slotProps.node.data.um }}
+            </span>
+            <multiselect v-else class="editInput" v-model="slotProps.node.data.um" :options="umOptions" @close="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'um')" placeholder="Select a unit" label="um" track-by="um"></multiselect>
+          </div>
+        </template>
+      </Column>
+      <!-- Source Column with Multiselect -->
+      <Column field="source" header="Source" style="width: 200px;">
+        <template #body="slotProps">
+          <div :class="{'source-column-editing': isEditing(slotProps.node.data, 'source'), 'source-column': !isEditing(slotProps.node.data, 'source')}">
+            <span v-if="!isEditing(slotProps.node.data, 'source')" :class="{'full-width-span': !slotProps.node.data.source}" @click.stop="if(slotProps.node.data.type === 'Part') { enableEditing(slotProps.node.data, 'source')}">
+              {{ slotProps.node.data.source.name || slotProps.node.data.source }}
+            </span>
+            <multiselect v-else class="editInput" v-model="slotProps.node.data.source" :options="sourceOptions" @close="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'source')" placeholder="Select a source" label="name" track-by="rowKey"></multiselect>
+          </div>
+        </template>
+      </Column>
+      <!-- Category Column -->
+      <!-- <Column field="category" header="Category" style="width: 150px;"></Column> -->
+      <!-- Vendor Column -->
+      <Column field="vendor" header="Vendor" style="width: 200px;">
+        <template #body="slotProps">
+          <div :class="{'vendor-column-editing': isEditing(slotProps.node.data, 'vendor'), 'vendor-column': !isEditing(slotProps.node.data, 'vendor')}">
+            <span v-if="!isEditing(slotProps.node.data, 'vendor')" :class="{'full-width-span': !slotProps.node.data.vendor}" @click.stop="if(slotProps.node.data.type === 'Part') { enableEditing(slotProps.node.data, 'vendor')} ">
+              {{ slotProps.node.data.vendor.code || slotProps.node.data.vendor }}
+            </span>
+            <multiselect v-else class="editInput" v-model="slotProps.node.data.vendor" :options="vendorOptions" @close="disableEditing(slotProps.node.data); onUpdate(slotProps.node.data, 'vendor')" placeholder="Select a vendor" label="code" track-by="rowKey"></multiselect>
+          </div>
+        </template>
+      </Column>
+
+      <!-- Product Line Column -->
+      <Column field="productLine" header="Product Line" style="width: 150px;"></Column>
+
+
+    </tree-table>
+    <div v-if="retrievingMats" style="width: 100%; flex-direction: column; display: flex; justify-content: center; align-items:center; height: 100%; margin-top: 10px;">
+      <b-spinner></b-spinner>
+      <p style="margin-top: 10px;">Retrieving Method Materials and Operations</p>
+    </div>
+
+  </div>
+</template>
+
+<script>
+  module.exports = {
+    data() {
+      return {
+        nodes: null,
+        retrievingMats: false,
+        filteredNodes: null,
+        expandedKeys: {
+
+        },
+        searchQuery: '',
+        observer: null,
+        search: '',
+        limit: 10,
+        toplevelParts: [],
+        selectedWorkOrder: null,
+        umOptions: $getGrid('unitsOfMeasure').map(um => {
+          return {
+            um: um.name,
+            rowKey: um.rowKey
+          }
+        }),
+        resourceGroupOptions: $getGrid('resourceGroup').map(resourceGroup => {
+          return {
+            resourceGroup: resourceGroup.name,
+            rowKey: resourceGroup.rowKey
+          }
+        }),
+        operationOptions: $getGrid('methodOperations').filter((op) => op.parentPart === '-O7dqXgwkPRyZmY_ydY0').map(op => {
+          return {
+            name: op.name,
+            rowKey: op.rowKey
+          }
+        }),
+        sourceOptions: $getGrid('partTypes').map(source => {
+          return {
+            name: source.name,
+            rowKey: source.rowKey
+          }
+        }),
+        vendorOptions: $getGrid('vendors').map(vendor => {
+          return {
+            code: vendor.code,
+            rowKey: vendor.rowKey
+          };
+        })
+      };
+    },
+    computed: {
+      methodMaterials() {
+        return $getGrid('methodMaterials');
+      },
+      paginated() {
+        return this.filtered?.slice(0, this.limit)
+      },
+      filtered() {
+        return this.toplevelParts.filter((part) => part.name && typeof part.name === 'string' && part.name.toLowerCase().includes(this.search.toLowerCase()))
+      },
+      hasNextPage() {
+        return this.paginated?.length < this.filtered.length
+      },
+    },
+    async created() {
+      await this.fetchTopLevelParts();
+    },
+    methods: {
+      updateMethodMatInTree(methodMat) {
+        // Find the node in the given treeNodes
+        console.log(methodMat.rowKey)
+        let node = this.findNodeByKey(this.filteredNodes, methodMat.rowKey);
+        if (node) {
+          let parentNode = this.findNodeByKey(this.filteredNodes, methodMat.parentPart);
+          // Update the node's data properties using this.$set to ensure reactivity
+          this.$set(node.data, 'name', methodMat.name);
+          this.$set(node.data, 'part', methodMat.$part$display);
+          this.$set(node.data, 'parentPart', methodMat.$parentPart$display);
+          this.$set(node.data, 'id', methodMat.rowKey);
+          this.$set(node.data, 'type', 'Material');
+          this.$set(node.data, 'sequence', methodMat.sequence);
+          this.$set(node.data, 'qtyRuntime', methodMat.quantityPer || null);
+          this.$set(node.data, 'um', methodMat.uoM && methodMat.$uoM$display ? {
+            um: methodMat.$uoM$display,
+            rowKey: methodMat.uoM
+          } : '');
+          // this.$set(node.data, 'description', methodMat.description || '');
+          // Update other fields as needed
+
+          // sort siblings by sequence
+          if (parentNode && parentNode.children && parentNode.children.length > 0) {
+            parentNode.children.sort((a, b) => {
+              if (!a.data.sequence && a.data.sequence != 0) return -1; // Move a to the top if falsy and not 0
+              if (!b.data.sequence && b.data.sequence != 0) return 1; // Move b to the top if falsy and not 0
+              return a.data.sequence - b.data.sequence;
+            });
+          }
+        } else {
+          this.insertMethodMatIntoTree(methodMat);
+          console.warn('Node not found in the tree for method material:', methodMat);
+        }
+      },
+      // Function to find a node by key
+      findNodeByKey(nodes, key) {
+        //console.log(nodes, 'nodes')
+        for (let node of nodes) {
+          //console.log(node.key, key)
+          if (node.key === key) {
+            return node;
+          } else if (node.children && node.children.length > 0) {
+            const found = this.findNodeByKey(node.children, key);
+            if (found) {
+              return found;
+            }
+          }
+        }
+        return null;
+      },
+      removeNodeByKey(nodes, key) {
+        //console.log(nodes, key, 'remove')
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i];
+          //console.log('node is: ', node)
+          if (node.key === key) {
+            // Remove the node from the array
+            nodes.splice(i, 1);
+            return true; // Node found and removed
+          } else if (node.children && node.children.length > 0) {
+            // Recursively search in child nodes
+            const found = this.removeNodeByKey(node.children, key);
+          }
+        }
+        return false; // Node not found in this branch
+      },
+
+      // Function to create a tree node from methodMat
+      createMethodMatNode(methodMat) {
+        return {
+          key: methodMat.rowKey,
+          data: {
+            name: methodMat.name,
+            part: methodMat.$part$display,
+            parentPart: methodMat.$parentPart$display,
+            id: methodMat.rowKey,
+            type: 'Material',
+            editing: false,
+            sequence: methodMat.sequence,
+            qtyRuntime: methodMat.quantityPer || null,
+            um: methodMat.uoM && methodMat.$uoM$display ? {
+              um: methodMat.$uoM$display,
+              rowKey: methodMat.uoM
+            } : '',
+            source: '',
+            vendor: '',
+            operation: methodMat.$operation$display || '',
+            resourceGroup: methodMat.$resourceGroup$display || '',
+            search: '',
+            description: methodMat?.$parentPart?.description || '',
+          },
+          children: []
+        };
+      },
+
+      // Function to insert the new methodMat into the tree
+      insertMethodMatIntoTree(methodMat) {
+
+        //console.log('about to insert, ', methodMat.rowKey)
+        // Find the parent node in the tree
+        let parentNode = this.findNodeByKey(this.filteredNodes, methodMat.parentPart);
+        if (parentNode) {
+          // Create a new node for the method material
+          let newNode = this.createMethodMatNode(methodMat);
+
+          // Ensure parentNode.children is reactive
+          if (!parentNode.children) {
+            this.$set(parentNode, 'children', []);
+          }
+
+          // Insert the new node at the beginning of the children array
+          parentNode.children.unshift(newNode)
+
+          // Update the expandedKeys to ensure the parent node is expanded
+          this.$set(this.expandedKeys, parentNode.key, true);
+        } else {
+          console.warn('Parent node not found in the tree for method material:', methodMat);
+        }
+      },
+      updateMethodOpInTree(methodOp) {
+        // Find the node in the tree
+        let node = this.findNodeByKey(this.filteredNodes, methodOp.rowKey);
+        if (node) {
+          let parentNode = this.findNodeByKey(this.filteredNodes, methodOp.parentPart);
+          // Update the node's data properties using this.$set to ensure reactivity
+          this.$set(node.data, 'name', methodOp.name);
+          this.$set(node.data, 'id', methodOp.rowKey);
+          this.$set(node.data, 'type', 'Operation');
+          this.$set(node.data, 'sequence', methodOp.sequence);
+          this.$set(node.data, 'qtyRuntime', methodOp.cycleTime || null);
+          this.$set(node.data, 'um', methodOp.uoM && methodOp.$uoM$display ? {
+            um: methodOp.$uoM$display,
+            rowKey: methodOp.uoM,
+          } : '');
+          this.$set(node.data, 'description', methodOp?.$parentPart?.description || '');
+          this.$set(node.data, 'setup', methodOp.setupTime || null);
+          this.$set(node.data, 'parentPart', methodOp.$parentPart$display || null);
+          this.$set(node.data, 'part', '');
+
+          // Sort siblings by sequence
+          if (parentNode && parentNode.children && parentNode.children.length > 0) {
+            parentNode.children.sort((a, b) => {
+              if (!a.data.sequence && a.data.sequence != 0) return -1; // Move a to the top if falsy and not 0
+              if (!b.data.sequence && b.data.sequence != 0) return 1; // Move b to the top if falsy and not 0
+              return a.data.sequence - b.data.sequence;
+            });
+          }
+        } else {
+          this.insertMethodOpIntoTree(methodOp)
+          console.warn('Node not found in the tree for method operation:', methodOp);
+        }
+      },
+      createMethodOpNode(methodOp) {
+        //console.log('method op is', methodOp)
+        return {
+          key: methodOp.rowKey,
+          data: {
+            name: methodOp.name || '',
+            id: methodOp.rowKey,
+            type: 'Operation',
+            sequence: methodOp.sequence || null,
+            qtyRuntime: methodOp.cycleTime || null,
+            um: methodOp.uoM && methodOp.$uoM$display ? {
+              um: methodOp.$uoM$display,
+              rowKey: methodOp.uoM,
+            } : '',
+            description: methodOp?.$parentPart?.description || '',
+            setup: methodOp.setupTime || null,
+            parentPart: methodOp.$parentPart$display || null,
+            part: '',
+            source: '',
+            vendor: methodOp.$vendor$display || '',
+            operation: methodOp.$operation$display || '',
+            resourceGroup: methodOp.$resourceGroup$display + ' - ' + methodOp?.$resourceGroup?.description || '',
+            search: '',
+          },
+          children: [],
+        };
+      },
+
+      insertMethodOpIntoTree(methodOp) {
+        // Find the parent node in the tree
+        let parentNode = this.findNodeByKey(this.filteredNodes, methodOp.parentPart);
+        if (parentNode) {
+          // Create a new node for the method operation
+          let newNode = this.createMethodOpNode(methodOp);
+
+          // Ensure parentNode.children is reactive
+          if (!parentNode.children) {
+            this.$set(parentNode, 'children', []);
+          }
+
+          // Insert the new node at the beginning of the children array
+          parentNode.children.unshift(newNode);
+
+          // Update the expandedKeys to ensure the parent node is expanded
+          this.$set(this.expandedKeys, parentNode.key, true);
+        } else {
+          console.warn('Parent node not found in the tree for method operation:', methodOp);
+        }
+      },
+      async onOpen() {
+        if (this.hasNextPage) {
+          await this.$nextTick()
+          this.observer.observe(this.$refs.load)
+        }
+      },
+      onClose() {
+        this.observer.disconnect()
+      },
+      async infiniteScroll([{
+        isIntersecting,
+        target
+      }]) {
+        if (isIntersecting) {
+          const ul = target.offsetParent
+          const scrollTop = target.offsetParent.scrollTop
+          this.limit += 10
+          await this.$nextTick()
+          ul.scrollTop = scrollTop
+        }
+      },
+
+      async fetchTopLevelParts() {
+        try {
+          let parts = $getGrid('parts')
+          this.toplevelParts = parts;
+          //console.log('toplevelparts', this.toplevelParts)
+        } catch (error) {
+          console.error('Error fetching top-level parts:', error);
+        }
+      },
+      async buildTree() {
+        this.filteredNodes = []
+        this.retrievingMats = true;
+
+        if (!this.selectedWorkOrder) {
+          this.filteredNodes = null;
+          return;
+        }
+
+        try {
+          console.time('Total Tree Building Time'); // Start logging the entire tree-building process
+          console.time('Fetching Parts'); // Log the time it takes to fetch the parts
+
+          const parts = await $getGrid('parts');
+
+          console.timeEnd('Fetching Parts'); // End logging for parts fetching
+
+          let alreadyFetchedParts = []
+
+
+          // Updated buildTree function with visited set
+          const buildTree = async (part, allParts, visited = new Set(), isTopLevel = false) => {
+            if (visited.has(part.rowKey)) {
+              return null; // Skip processing this part again to avoid infinite recursion
+            }
+            visited.add(part.rowKey);
+
+            console.time(`Building Tree for Part ${part.rowKey}`); // Start logging for each part's tree building
+
+            console.time(`Fetching Method Materials for Part ${part.rowKey}`);
+            const allMethodMaterials = await $getGrid('methodMaterials');
+            console.timeEnd(`Fetching Method Materials for Part ${part.rowKey}`);
+
+            const materials = allMethodMaterials.filter(mat => mat.parentPart === part.rowKey);
+
+            console.time(`Fetching Method Operations for Part ${part.rowKey}`);
+            const allMethodOperations = await $getGrid('methodOperations');
+            console.timeEnd(`Fetching Method Operations for Part ${part.rowKey}`);
+
+            const operations = allMethodOperations.filter(op => op.parentPart === part.rowKey);
+
+            // Log material node creation
+            const materialNodesPromises = materials.map(async mat => {
+              console.time(`Creating Material Node ${mat.rowKey}`);
+              const matchingParts = allParts.filter(p => p.rowKey === mat.part);
+
+              if (matchingParts && matchingParts.length > 0) {
+                for (const matchingPart of matchingParts) {
+                  if (!alreadyFetchedParts.includes(matchingPart.rowKey)) {
+                    await this.fetchMethodMaterialsForPart(matchingPart);
+
+                    alreadyFetchedParts.push(matchingPart.rowKey)
+                  }
+                }
+              }
+
+              const materialNode = {
+                key: mat.rowKey,
+                data: {
+                  name: mat.name,
+                  part: mat.$part$display,
+                  parentPart: mat.$parentPart$display,
+                  id: mat.rowKey,
+                  type: 'Material',
+                  editing: false,
+                  sequence: mat.sequence,
+                  qtyRuntime: mat.quantityPer || null,
+                  um: mat.uoM && mat.$uoM$display ? {
+                    um: mat.$uoM$display,
+                    rowKey: mat.uoM
+                  } : '',
+                  source: '',
+                  vendor: '',
+                  operation: mat.$operation$display || '',
+                  resourceGroup: mat.$resourceGroup$display || '',
+                  search: '',
+                  description: part.description ? part.description : mat.description || '',
+                },
+                children: await Promise.all(matchingParts.map(matchingPart => buildTree(matchingPart, allParts, visited)))
+                // children: matchingParts.map(matchingPart => buildTree(matchingPart, allParts, visited))
+              };
+
+              //console.log('material node children are: ', await Promise.all(matchingParts.map(matchingPart => buildTree(matchingPart, allParts, visited))))
+
+              if (materialNode.children && materialNode.children.length > 0) {
+                materialNode.children = materialNode.children.filter((node) => {
+                  return node && node.key
+                })
+              }
+
+              console.timeEnd(`Creating Material Node ${mat.rowKey}`);
+              return materialNode;
+            });
+
+            // Log operation node creation
+            const operationNodesPromises = operations.map(async op => {
+              console.time(`Creating Operation Node ${op.rowKey}`);
+              const matchingParts = allParts.filter(p => p.rowKey === op.parentPart);
+
+              if (matchingParts && matchingParts.length > 0) {
+                for (const matchingPart of matchingParts) {
+                  if (!alreadyFetchedParts.includes(matchingPart.rowKey)) {
+                    await this.fetchMethodMaterialsForPart(matchingPart);
+
+                    alreadyFetchedParts.push(matchingPart.rowKey)
+                  }
+                }
+              }
+
+              const operationNode = {
+                key: op.rowKey,
+                data: {
+                  name: op.name,
+                  id: op.rowKey,
+                  type: 'Operation',
+                  editing: false,
+                  sequence: op.sequence,
+                  operation: op.$operation$display || '',
+                  resourceGroup: op.$resourceGroup$display + ' - ' + op?.$resourceGroup?.description || '',
+                  qtyRuntime: op.cycleTime || null,
+                  um: op.uoM && op.$uoM$display ? {
+                    um: op.$uoM$display,
+                    rowKey: op.uoM
+                  } : '',
+                  source: '',
+                  vendor: op.$vendor$display || '',
+                  search: '',
+                  setup: op.setupTime || null,
+                  description: op?.$parentPart?.description || '',
+                  parentPart: op.$parentPart$display || null,
+                  part: ''
+                },
+                children: await Promise.all(matchingParts.map(matchingPart => buildTree(matchingPart, allParts, visited))),
+                // children: matchingParts.map(matchingPart => buildTree(matchingPart, allParts, visited)),
+              };
+
+              if (operationNode.children && operationNode.children.length > 0) {
+                operationNode.children = operationNode.children.filter(node => node && node.key);
+              }
+
+              console.timeEnd(`Creating Operation Node ${op.rowKey}`);
+              return operationNode;
+            });
+
+            const materialNodes = await Promise.all(materialNodesPromises);
+            const operationNodes = await Promise.all(operationNodesPromises);
+
+            const childrenNodes = [...materialNodes, ...operationNodes];
+
+            childrenNodes.sort((a, b) => {
+              if (!a.data.sequence && a.data.sequence != 0) return -1; // Move a to the top if falsy and not 0
+              if (!b.data.sequence && b.data.sequence != 0) return 1; // Move b to the top if falsy and not 0
+              return a.data.sequence - b.data.sequence;
+            });
+
+            //console.log('children nodes are:', childrenNodes)
+
+
+            console.timeEnd(`Building Tree for Part ${part.rowKey}`); // End logging for this part
+
+            if (!isTopLevel && (!childrenNodes || childrenNodes.length === 0)) return null
+
+            return {
+              key: part.rowKey,
+              data: {
+                name: part.name,
+                id: part.rowKey,
+                type: 'Part',
+                parentPart: part.$part$display || '',
+                description: part.description,
+                editing: false,
+                um: part.quoteUnitOfMeasure && part.$quoteUnitOfMeasure$display ? {
+                  um: part.$quoteUnitOfMeasure$display,
+                  rowKey: part.quoteUnitOfMeasure
+                } : '',
+                source: part.type && part.$type$display ? {
+                  name: part.$type$display,
+                  rowKey: part.type
+                } : '',
+                vendor: part.preferredVendor && part.$preferredVendor$display ? {
+                  name: part.$preferredVendor$display,
+                  rowKey: part.preferredVendor
+                } : '',
+                qtyRuntime: part.quantityRuntime || null,
+                part: ''
+              },
+              children: childrenNodes,
+              isTopLevel
+            };
+          };
+
+          const selectedPart = this.toplevelParts.find(part => part.rowKey === this.selectedWorkOrder.rowKey);
+
+          await this.fetchMethodMaterialsForPart(selectedPart);
+
+          console.time('Building Initial Tree'); // Log the time to build the initial tree
+          this.nodes = [await buildTree(selectedPart, parts, new Set(), true)];
+          //console.log('Built Nodes:', this.nodes)
+          this.filteredNodes = this.nodes;
+          console.timeEnd('Building Initial Tree');
+
+          console.timeEnd('Total Tree Building Time'); // End logging the entire tree-building process
+
+          this.retrievingMats = false;
+        } catch (error) {
+          // this.expandFilteredNodes(this.filteredNodes);
+          console.error('Error building tree:', error);
+        }
+      },
+      async fetchMethodMaterialsForPart(part) {
+        console.time(`retrieving mats for ${part.rowKey}`)
+        ////console.log('part rowKey is: ', part.rowKey)
+
+        let payload = {
+          part: part.rowKey
+        }
+
+        let materials = await this.$parent.$wfGetData('-OHlydnV5OU37UTgjO5l', payload)
+
+        ////console.log('materials found,', materials)
+        // console.timeEnd('retrieving mats')
+        // console.time('committingMats')
+        if (materials && materials.methodOperations && materials.methodOperations.length > 0) {
+          try {
+            for (const operation of materials.methodOperations) {
+              ////console.log('operation:', operation);
+              const logVal = {
+                gridId: 'methodOperations',
+                rowKey: operation.rowKey,
+                newVal: JSON.stringify(operation),
+              };
+              this.$parent.$store.commit('dataGrid_onRowLogArrived', logVal);
+            }
+          } catch (err) {
+            console.error(err)
+          }
+        }
+
+        if (materials && materials.methodMaterials && materials.methodMaterials.length > 0) {
+          ////console.log('committing mats', this.retrievingMats)
+          try {
+            for (const mat of materials.methodMaterials) {
+              ////console.log('mat:', mat);
+              const logVal = {
+                gridId: 'methodMaterials',
+                rowKey: mat.rowKey,
+                newVal: JSON.stringify(mat),
+              };
+              this.$parent.$store.commit('dataGrid_onRowLogArrived', logVal);
+            }
+            // this.retrievingMats = false
+            console.timeEnd(`retrieving mats for ${part.rowKey}`)
+          } catch (err) {
+            // this.retrievingMats = false
+            console.error(err)
+
+          }
+
+        } else {
+          // this.retrievingMats = false
+        }
+
+      },
+      openRecord(record) {
+        ////console.log(`Open Record `, record);
+        if (record.type === 'Part') {
+          $dgShowPreview('parts', record.id);
+        } else if (record.type === 'Material') {
+          $dgShowPreview('methodMaterials', record.id);
+        } else if (record.type === 'Operation') {
+          $dgShowPreview('methodOperations', record.id);
+        }
+      },
+      searchTree() {
+        ////console.log(this.selectedWorkOrder, 'selected');
+
+        let nodesToFilter = this.nodes;
+
+        if (this.selectedWorkOrder) {
+          nodesToFilter = this.nodes.filter(node => node.data.id === this.selectedWorkOrder.rowKey);
+        }
+
+        if (this.searchQuery.trim() === '') {
+          this.filteredNodes = nodesToFilter;
+          this.expandFilteredNodes(this.filteredNodes);
+          return;
+        }
+
+        const searchQuery = this.searchQuery.toLowerCase();
+
+        const filterNodes = (nodes) => {
+          return nodes.filter(node => {
+            const nodeName = node.data.name ? node.data.name.toLowerCase() : '';
+            const nodeId = node.data.id ? node.data.id.toLowerCase() : '';
+
+            if (nodeName.includes(searchQuery) || nodeId.includes(searchQuery)) {
+              return true;
+            }
+
+            if (node.children) {
+              const filteredChildren = filterNodes(node.children);
+              if (filteredChildren.length > 0) {
+                node.children = filteredChildren;
+                return true;
+              }
+            }
+
+            return false;
+          });
+        };
+
+        this.filteredNodes = filterNodes(JSON.parse(JSON.stringify(nodesToFilter)));
+        this.expandFilteredNodes(this.filteredNodes);
+      },
+      expandAll() {
+        for (let node of this.filteredNodes) {
+          this.expandNode(node);
+        }
+
+        this.expandedKeys = {
+          ...this.expandedKeys
+        };
+
+
+
+        //console.log('expandedn keys are ', this.expandedKeys)
+        //console.log(this.filteredNodes)
+      },
+      expandNode(node) {
+        if (node.children && node.children.length) {
+          this.expandedKeys[node.key] = true;
+
+          for (let child of node.children) {
+            this.expandNode(child);
+          }
+        }
+      },
+      collapseAll() {
+        this.expandedKeys = {}
+      },
+      enableEditing(node, field) {
+        // Set editing to true and track the specific field being edited
+        this.$set(node, 'editing', true);
+        this.$set(node, 'editingField', field);
+      },
+      disableEditing(node) {
+        // Reset the editing field and disable editing
+        this.$set(node, 'editing', false);
+        this.$set(node, 'editingField', null);
+      },
+      isEditing(node, field) {
+        // Check if the node is in editing mode and if the specific field is being edited
+        // //console.log(node)
+        return node.editing && node.editingField === field;
+      },
+      onUpdate(node, type) {
+        if (type === 'name') {
+          if (node.type === 'Part') {
+            $dgSetRowVals('parts', node.id, {
+              name: node.name,
+            });
+          } else if (node.type === 'Material') {
+            $dgSetRowVals('methodMaterials', node.id, {
+              name: node.name,
+            });
+          } else if (node.type === 'Operation') {
+            $dgSetRowVals('methodOperations', node.id, {
+              name: node.name,
+            });
+          }
+        }
+
+        if (type === 'sequence') {
+          if (node.type === 'Part') {
+            $dgSetRowVals('parts', node.id, {
+              sequence: node.sequence,
+            });
+          } else if (node.type === 'Material') {
+            $dgSetRowVals('methodMaterials', node.id, {
+              sequence: node.sequence,
+            });
+          } else if (node.type === 'Operation') {
+            $dgSetRowVals('methodOperations', node.id, {
+              sequence: node.sequence,
+            });
+          }
+        }
+
+        // if (type === 'description') {
+        //   if (node.type === 'Part') {
+        //     $dgSetRowVals('parts', node.id, {
+        //       description: node.description,
+        //     });
+        //   } else if (node.type === 'Material') {
+        //     $dgSetRowVals('methodMaterials', node.id, {
+        //       description: node.description,
+        //     });
+        //   } else if (node.type === 'Operation') {
+        //     $dgSetRowVals('methodOperations', node.id, {
+        //       description: node.description,
+        //     });
+        //   }
+        // }
+
+        if (type === 'um') {
+          if (node.type === 'Part') {
+            $dgSetRowVals('parts', node.id, {
+              quoteUnitOfMeasure: node.um.rowKey, // Update the UM field in the database
+            });
+          } else if (node.type === 'Material') {
+            $dgSetRowVals('methodMaterials', node.id, {
+              uoM: node.um.rowKey, // Update the UM field in the database
+            });
+          } else if (node.type === 'Operation') {
+            $dgSetRowVals('methodOperations', node.id, {
+              uoM: node.um.rowKey, // Update the UM field in the database
+            });
+          }
+        }
+
+        if (type === 'source') {
+          if (node.type === 'Part') {
+            $dgSetRowVals('parts', node.id, {
+              type: node.source.rowKey, // Update source in the database
+            });
+          } else if (node.type === 'Material') {
+            $dgSetRowVals('methodMaterials', node.id, {
+              source: node.source.rowKey, // Update source in the database
+            });
+          } else if (node.type === 'Operation') {
+            // $dgSetRowVals('methodOperations', node.id, {
+            //   source: node.source.rowKey, // Update source in the database
+            // });
+          }
+        }
+
+        if (type === 'qtyRuntime') {
+          if (node.type === 'Material') {
+            $dgSetRowVals('methodMaterials', node.id, {
+              quantityPer: node.qtyRuntime || null, // Update qtyRuntime for Materials
+            });
+          } else if (node.type === 'Operation') {
+            $dgSetRowVals('methodOperations', node.id, {
+              runtime: node.cycleTime || null, // Update runtime for Operations
+            });
+          } else if (node.type === 'Part') {
+            $dgSetRowVals('parts', node.id, {
+              quantityRuntime: node.qtyRuntime || null, // Update runtime for Operations
+            });
+          }
+        }
+
+        if (type === 'vendor') {
+          if (node.type === 'Part') {
+            $dgSetRowVals('parts', node.id, {
+              preferredVendor: node.vendor.rowKey, // Update the preferredVendor field in the database
+            });
+          } else if (node.type === 'Material') {
+            $dgSetRowVals('methodMaterials', node.id, {
+              vendor: node.vendor.rowKey, // Update vendor for Materials
+            });
+          } else if (node.type === 'Operation') {
+            $dgSetRowVals('methodOperations', node.id, {
+              vendor: node.vendor.rowKey, // Update vendor for Operations
+            });
+          }
+        }
+
+        if (type === 'setup') {
+          if (node.type === 'Operation') {
+            $dgSetRowVals('methodOperations', node.id, {
+              setupTime: node.setup, // Update opCode for Operations
+            });
+          }
+        }
+      },
+      handleClickOutside(event) {
+        const tableContainer = this.$refs.tableContainer;
+
+        // Check if the click was outside the table
+        if (!tableContainer.contains(event.target)) {
+          this.closeAllEditingFields();
+        }
+      },
+      closeAllEditingFields() {
+        const closeEditingInNode = (node) => {
+          this.$set(node.data, 'editing', false);
+          this.$set(node.data, 'editingField', null);
+
+          // If the node has children, recursively close them as well
+          if (node.children && node.children.length > 0) {
+            node.children.forEach(childNode => closeEditingInNode(childNode));
+          }
+        };
+
+        // Apply the function to all nodes starting from the root nodes
+        if (this.nodes && this.nodes.length > 0) {
+          this.nodes.forEach(node => closeEditingInNode(node));
+        }
+      },
+      handleEscapeKey(event) {
+        // //console.log(event)
+        if (event.key === 'Escape') {
+          this.closeAllEditingFields();
+        }
+      },
+      onMatAdded(rowKey) {
+        console.log('method material added', rowKey)
+        if (rowKey && this.filteredNodes && this.filteredNodes.length > 0) {
+          let methodMat = $getDashboardModel('methodMaterials')[rowKey]
+          setTimeout(() => {
+            //console.log(methodMat)
+            // Insert the new methodMat into the tree
+            this.insertMethodMatIntoTree(methodMat);
+
+          }, 100)
+
+        }
+      },
+      onMatChanged(rowKey) {
+        console.log('method material changed', rowKey)
+        if (rowKey && this.filteredNodes && this.filteredNodes.length > 0) {
+          setTimeout(() => {
+            let methodMat = $getDashboardModel('methodMaterials')[rowKey]
+            //console.log(methodMat)
+            // update the  methodMat in the tree
+            if (methodMat) this.updateMethodMatInTree(methodMat);
+            else this.removeNodeByKey(this.filteredNodes, rowKey)
+
+          }, 100)
+        }
+      },
+      onOpAdded(rowKey) {
+        //console.log('method operation added', rowKey);
+        if (rowKey && this.filteredNodes && this.filteredNodes.length > 0) {
+          let methodOp = $getDashboardModel('methodOperations')[rowKey];
+          setTimeout(() => {
+            //console.log(methodOp);
+            // Insert the new method operation into the tree
+            this.insertMethodOpIntoTree(methodOp);
+          }, 100);
+        }
+      },
+      onOpChanged(rowKey) {
+        //console.log('method operation changed', rowKey);
+        if (rowKey && this.filteredNodes && this.filteredNodes.length > 0) {
+          setTimeout(() => {
+            let methodOp = $getDashboardModel('methodOperations')[rowKey];
+            //console.log(methodOp, 'methodOp found');
+            // Update the method operation in the tree
+            if (methodOp) this.updateMethodOpInTree(methodOp);
+            else this.removeNodeByKey(this.filteredNodes, rowKey)
+
+          }, 100);
+        }
+      }
+    },
+    mounted() {
+      //console.log(this.$parent.eventBus._events['fbRowAdded-methodMaterials'])
+      console.log(this.$parent.eventBus)
+
+      this.$parent.eventBus.$off('fbRowAdded-methodMaterials')
+      this.$parent.eventBus.$off('dgRowChanged-methodMaterials')
+      this.$parent.eventBus.$off('fbRowAdded-methodOperations');
+      this.$parent.eventBus.$off('dgRowChanged-methodOperations');
+
+      this.$parent.eventBus.$on('fbRowAdded-methodMaterials', this.onMatAdded)
+
+      this.$parent.eventBus.$on('dgRowChanged-methodMaterials', this.onMatChanged)
+
+      // Event listener for method operations added
+      this.$parent.eventBus.$on('fbRowAdded-methodOperations', this.onOpAdded);
+
+      // Event listener for method operations changed
+      this.$parent.eventBus.$on('dgRowChanged-methodOperations', this.onOpChanged);
+
+      document.addEventListener('click', this.handleClickOutside);
+      document.addEventListener('keyup', this.handleEscapeKey);
+      this.observer = new IntersectionObserver(this.infiniteScroll)
+    },
+    beforeDestroy() {
+      //console.log('before destroying')
+      //console.log(this.$parent)
+    },
+
+    beforeDestroy() {
+      document.removeEventListener('click', this.handleClickOutside);
+      document.removeEventListener('keyup', this.handleEscapeKey);
+    },
+  };
+</script>
+<style scoped>
+  input {
+    width: 100%;
+    font-size: 10px;
+  }
+
+  .editInput {
+    position: absolute;
+    width: max-content;
+    top: 2px;
+    bottom: 2px;
+    /* left: 1px; */
+    /* right: 1px; */
+  }
+
+  .p-treetable-toggler {
+    background: yellow;
+  }
+
+  .header {
+    display: flex;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .header-item {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  /* Set minimum width for the name column */
+  .name-column {
+    min-width: 150px;
+    /* Adjust the value as needed */
+  }
+
+  /* Optionally ensure the header cell for the name column also has a minimum width */
+  .p-treetable thead th:first-child {
+    width: 200px !important;
+    /* Adjust the value to match the tbody */
+  }
+
+  .um-column,
+  .source-column,
+  .desc-column {
+    min-width: 100px;
+    max-width: 150px;
+    width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    /* Ensure it takes up the available space */
+  }
+
+  .um-column-editing,
+  .operation-column-editing,
+  .source-column-editing,
+  .desc-column-editing {
+    min-width: 250px;
+    max-width: 300px;
+    width: auto;
+  }
+
+  .full-width-span {
+    display: inline-block;
+    /* Ensures span behaves like a block element */
+    width: 90%;
+    /* Takes up 100% of the column width */
+    min-height: 20px;
+    /* Optionally set a minimum height to make it easier to click */
+  }
+
+  th,
+  td {
+    border: solid 1px #ccc !important;
+  }
+
+  th,
+  td {
+
+    padding: 0px 0px 0px 5px !important;
+    font-size: 0.6rem;
+  }
+
+  td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  tr {
+    position: relative;
+  }
+
+
+
+  td button {
+    font-size: 0.6rem !important;
+  }
+
+  input.multiselect__input {
+
+    font-size: 0.6rem !important;
+
+  }
+
+  .pagination {
+    display: flex;
+    margin: 0.25rem 0.25rem 0;
+  }
+
+  .pagination button {
+    flex-grow: 1;
+  }
+
+  .pagination button:hover {
+    cursor: pointer;
+  }
+
+  .multiselect__single {
+    font-size: 10px;
+  }
+
+  .multiselect__placeholder {
+    font-size: 10px;
+  }
+
+  .loader {
+    text-align: center;
+    color: #bbbbbb;
+  }
+
+
+  .multiselect__element {
+    min-width: max-content;
+  }
+
+  .multiselect__option {
+    font-size: 10px;
+  }
+
+  .multiselect__content-wrapper {
+    min-width: max-content;
+  }
+</style>

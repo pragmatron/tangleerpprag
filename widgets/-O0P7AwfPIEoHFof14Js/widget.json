@@ -1,0 +1,16 @@
+{
+  "gsOptions": {
+    "h": 13,
+    "w": 24,
+    "x": 0,
+    "y": 7
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "quotes"
+  },
+  "subtab": "-NnmsKcNUmAqZF3LO6JU",
+  "tab": "-NZQQhYtGqKTbT0LahRT",
+  "type": "DataGrid"
+}

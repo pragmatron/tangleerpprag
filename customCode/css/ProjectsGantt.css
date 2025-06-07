@@ -1,0 +1,9 @@
+.gantt-wrapper {
+    display: block !important;
+    margin-top: 12px;
+}
+
+.gantt-chart-controls {
+    position: absolute;
+    z-index: 999999999;
+}

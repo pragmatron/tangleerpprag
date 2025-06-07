@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/supportRequests",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "supportRequests"
+  },
+  "subtab": "-OOdB7MFksuhFTqW4k_0",
+  "tab": "-OHJB4bIQfEqvjnU_G3s",
+  "type": "DataGrid"
+}

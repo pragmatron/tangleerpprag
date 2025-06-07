@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/aRInvoices",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "aRInvoices"
+  },
+  "subtab": "-NaIEmokt4KVsmya7kLj",
+  "tab": "-NaHqLtD79ED7xgtJm3s",
+  "type": "DataGrid"
+}

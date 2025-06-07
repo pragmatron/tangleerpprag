@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/addresses",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "addresses"
+  },
+  "subtab": "-N_nHXUZ1NhtwJ9N6uBH",
+  "tab": "-Nr16kQdMyZP5X_9exWf",
+  "type": "DataGrid"
+}

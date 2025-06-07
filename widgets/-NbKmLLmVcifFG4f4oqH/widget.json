@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/operationTypes",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "operationTypes"
+  },
+  "subtab": "-NbKmLJZfknLi0RRrMl3",
+  "tab": "-NZl1GT89ekLN8eDvSEE",
+  "type": "DataGrid"
+}

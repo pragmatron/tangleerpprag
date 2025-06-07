@@ -1,0 +1,28 @@
+{
+  "chartName": "Sales By Part",
+  "chartType": "line",
+  "colorPalette": {
+    "colorPalette": {
+      "value": "default"
+    }
+  },
+  "datalabels": {
+    "hidden": false
+  },
+  "filterValues": {
+    "hidden": false
+  },
+  "groupBy": [
+    {
+      "column": "$part$display",
+      "key": "-OGkOwiKcWoDSbepCNNV"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalLineAmount",
+      "key": "-OGkOwivbKQ4T0n-Px6s",
+      "operator": "sum"
+    }
+  ]
+}

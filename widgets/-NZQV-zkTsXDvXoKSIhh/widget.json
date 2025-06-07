@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/contacts",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "contacts"
+  },
+  "subtab": "-NZQV-xg8hgllkcGj1u0",
+  "tab": "-Nr16kQdMyZP5X_9exWf",
+  "type": "DataGrid"
+}

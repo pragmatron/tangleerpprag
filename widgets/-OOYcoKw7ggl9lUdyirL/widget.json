@@ -1,0 +1,16 @@
+{
+  "dependency": "boardData/-OOYdLLKnCGTgTeahK1I",
+  "gsOptions": {
+    "h": 18,
+    "w": 24,
+    "x": 0,
+    "y": 0
+  },
+  "layout": "b-card",
+  "props": {
+    "boardId": "-OOYdLLKnCGTgTeahK1I"
+  },
+  "subtab": "-OOYcmZxLV7f6gvfGyEw",
+  "tab": "-NZQQaXubwP2EQjuVATC",
+  "type": "Board"
+}

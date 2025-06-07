@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/workOrderStages",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "workOrderStages"
+  },
+  "subtab": "-Nha3zStEMQDHLzaClMB",
+  "tab": "-NZQRbcH19LNNooOkTCU",
+  "type": "DataGrid"
+}

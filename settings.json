@@ -1,0 +1,35 @@
+{
+  "cachingForUsers": "IExbYiRgRLdw4BMqAJyB9omEhov1",
+  "globalSearchEnabled": true,
+  "index_tokens": {
+    "269": {
+      "2": true
+    },
+    "302": [
+      true
+    ],
+    "-03": {
+      "5": true
+    },
+    "026": [
+      null,
+      true
+    ],
+    "69-": {
+      "3": true
+    },
+    "9-0": {
+      "4": true
+    }
+  },
+  "modelsCachingEnabled": true,
+  "regional": {
+    "currency": "$",
+    "date": "MM/DD/YYYY",
+    "time": "MM/DD/YYYY, HH:mm"
+  },
+  "sessionExpirationEnabled": false,
+  "sessionExpirationTime": 0,
+  "sessionTimeMeasure": "hours",
+  "showDataGridRecordsHistory": true
+}

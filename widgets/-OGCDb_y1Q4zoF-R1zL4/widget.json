@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/instructionspage",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "instructionspage"
+  },
+  "subtab": "-OGCDbZhc8VY3sMYCF-H",
+  "tab": "-NZQQhYtGqKTbT0LahRT",
+  "type": "DataGrid"
+}

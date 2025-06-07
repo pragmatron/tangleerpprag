@@ -1,0 +1,14 @@
+{
+  "dependency": "dataGrid/onboardingQuestionaire",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "onboardingQuestionaire"
+  },
+  "tab": "-OHJB4bIQfEqvjnU_G3s",
+  "type": "DataGrid"
+}

@@ -1,0 +1,17 @@
+{
+  "chartName": "Sales Orders by Customer",
+  "chartType": "bar",
+  "groupBy": [
+    {
+      "column": "customer",
+      "key": "-OE-MVbOJMQ_CwCr8WOn"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "endCustomerPrice",
+      "key": "-OE-MVbOJMQ_CwCr8WOm",
+      "operator": "sum"
+    }
+  ]
+}

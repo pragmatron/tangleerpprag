@@ -1,0 +1,30 @@
+{
+  "chartName": "Sales By Salesperson",
+  "chartType": "pie",
+  "datalabels": {
+    "hidden": true
+  },
+  "filterValues": {
+    "hidden": false
+  },
+  "groupBy": [
+    {
+      "column": "salesperson",
+      "key": "-O9AivlO4J4x8eczq0CI"
+    }
+  ],
+  "labels": {
+    "position": "top"
+  },
+  "metrics": [
+    {
+      "column": "totalQuoteLinePrice",
+      "format": "$0.00",
+      "key": "-O9AiwpGPK1_XEOW9bu8",
+      "operator": "sum"
+    }
+  ],
+  "outsideLabels": {
+    "visible": false
+  }
+}

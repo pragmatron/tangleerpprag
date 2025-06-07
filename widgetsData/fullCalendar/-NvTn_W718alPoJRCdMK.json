@@ -1,0 +1,13 @@
+{
+  "cardColorCoding": "",
+  "colorField": "",
+  "dataSource": "salesLines",
+  "displayMode": "dayGridMonth",
+  "durationField": "totalEstimatedHours",
+  "dynamicClassBinding": "",
+  "endField": "",
+  "nameField": "",
+  "startField": "requiredBy",
+  "templateCode": "return `<h3>${item.name}</h3>`",
+  "userField": "owner"
+}

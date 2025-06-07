@@ -1,0 +1,17 @@
+{
+  "dependency": "dataGrid/workOrderMaterials",
+  "gsOptions": {
+    "h": 31,
+    "w": 24,
+    "x": 0,
+    "y": 2
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "workOrderMaterials"
+  },
+  "subtab": "-NZl1RdbLQ4GElkF1vGT",
+  "tab": "-NZl1GT89ekLN8eDvSEE",
+  "type": "DataGrid"
+}

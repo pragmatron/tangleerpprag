@@ -1,0 +1,23 @@
+{
+  "chartName": "Sales Lines by Customer",
+  "chartType": "bar",
+  "colorPalette": {
+    "colorPalette": {
+      "label": "Default",
+      "value": "default"
+    }
+  },
+  "groupBy": [
+    {
+      "column": "customer",
+      "key": "-OP5oVtwEQFgnr2wXmBM"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "Name",
+      "key": "-OP5oVtwEQFgnr2wXmBL",
+      "operator": "count"
+    }
+  ]
+}

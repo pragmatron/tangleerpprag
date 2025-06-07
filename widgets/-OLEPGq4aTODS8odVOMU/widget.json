@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/quoteStatus",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "quoteStatus"
+  },
+  "subtab": "-OLEPGjWCoud4NFjY9NY",
+  "tab": "-NZQRbcH19LNNooOkTCU",
+  "type": "DataGrid"
+}

@@ -1,0 +1,74 @@
+{
+  "data": {
+    "metaData": {
+      "id": "-ODwBZPK085MEJn18edy",
+      "statusField": ""
+    },
+    "nodes": [
+      {
+        "id": "node1734099450824",
+        "x": 63,
+        "y": 138,
+        "name": "start-event",
+        "label": "Start Event",
+        "clazz": "startEvent",
+        "icon": {
+          "name": "flag",
+          "color": "hsl(154, 64%, 49%)"
+        },
+        "attachment": {},
+        "outcomes": [],
+        "customWidth": 250,
+        "customHeight": 60
+      },
+      {
+        "id": "node1734099452796",
+        "x": 700,
+        "y": 180,
+        "name": "script-task",
+        "label": "Script Task",
+        "clazz": "scriptTask",
+        "icon": {
+          "name": "terminal",
+          "color": "hsl(218, 54%, 20%)"
+        },
+        "attachment": {},
+        "outcomes": [],
+        "customWidth": 250,
+        "customHeight": 60
+      },
+      {
+        "id": "node1734138183839",
+        "x": 266,
+        "y": 312,
+        "name": "script-task",
+        "label": "Script Task",
+        "clazz": "scriptTask",
+        "icon": {
+          "name": "terminal",
+          "color": "hsl(218, 54%, 20%)"
+        },
+        "attachment": {},
+        "outcomes": [],
+        "customWidth": 250,
+        "customHeight": 60
+      }
+    ],
+    "edges": [],
+    "transform": {
+      "x": 63.21211641410463,
+      "y": 124.6509254645317,
+      "scale": 0.2,
+      "isAnimated": false
+    },
+    "settings": {
+      "isWorkflowTransformationEnabled": true,
+      "isNodesAlignmentEnabled": true,
+      "workflowMode": "default",
+      "isCompact": false
+    }
+  },
+  "handleAsSingleScript": false,
+  "name": "incomingedi",
+  "schema": "{\"swagger\":\"2.0\",\"info\":{\"title\":\"incomingedi\"},\"host\":\"us-central1-tangledev00.cloudfunctions.net\",\"basePath\":\"/webhook/undefined\",\"schemes\":[\"https\"],\"consumes\":[\"application/json\"],\"produces\":[\"application/json\"],\"paths\":{\"undefined\":{\"post\":{\"tags\":[],\"description\":\"\",\"produces\":[\"application/json\"],\"parameters\":[],\"responses\":{\"200\":{\"description\":\"response\",\"schema\":{\"type\":\"object\",\"properties\":{}}}}}}}}"
+}

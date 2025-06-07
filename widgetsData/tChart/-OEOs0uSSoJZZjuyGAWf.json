@@ -1,0 +1,17 @@
+{
+  "chartName": "Total Sales Orders by Customer",
+  "chartType": "table",
+  "groupBy": [
+    {
+      "column": "soldToCustomer",
+      "key": "-OEOs0uSSoJZZjuyGAWe"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalQuoteLinePrice",
+      "key": "-OEOs0uRup_q3fR0ruSs",
+      "operator": "sum"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/aPInvoices",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "aPInvoices"
+  },
+  "subtab": "-NaHqOMnPlZl4wf3PRZm",
+  "tab": "-NaHqLtD79ED7xgtJm3s",
+  "type": "DataGrid"
+}

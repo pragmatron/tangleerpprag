@@ -1,0 +1,8 @@
+<b-button 
+  variant="primary"
+  size="sm"
+  @click="createPosFromMaterials($store.state.dgRowInEditMode)"
+  :disabled="!Object.keys($store.state.dgRowInEditMode).some(key => key.startsWith('workOrderMaterials.'))"
+>
+  Create POs from Selected Materials
+</b-button>

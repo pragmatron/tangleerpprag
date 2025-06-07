@@ -1,0 +1,14 @@
+{
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "shipping"
+  },
+  "subtab": "-OQngIPNlmnoieH8YIrU",
+  "tab": "-O0P6ggwL94dkCCs88Ue",
+  "type": "DataGrid"
+}

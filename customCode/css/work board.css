@@ -1,0 +1,44 @@
+.tesla-card {
+  background: #FFB800;
+  padding: 10px;
+  width: fit-content;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+}
+
+.tesla-card__header {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.tesla-card__row {
+  display: flex;
+  gap: 20px;
+  padding: 2px 0;
+}
+
+.tesla-card__row--flash {
+  animation: flash 2s infinite;
+}
+
+.tesla-card__row--footer {
+  margin-top: 5px;
+}
+
+.tesla-card__cell--type {
+  width: 120px;
+}
+
+.tesla-card__cell--code {
+  width: 150px;
+}
+
+.tesla-card__cell--date {
+  width: 100px;
+}
+
+@keyframes flash {
+  0% { background-color: #FFB800; }
+  50% { background-color: #FFF2CC; }
+  100% { background-color: #FFB800; }
+}

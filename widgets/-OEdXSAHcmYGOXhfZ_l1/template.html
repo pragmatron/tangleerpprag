@@ -1,0 +1,717 @@
+<template>
+  <div class="forecast-pivot">
+
+    <!-- Products Forecast Table -->
+    <table class="pivot-table mb-8">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th v-for="month in uniqueMonths" :key="month">{{ month }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="product in uniqueProducts" :key="product.rowKey">
+          <td class="product-cell">{{ product.name }}</td>
+          <td v-for="month in uniqueMonths" :key="month">
+            <input type="number" :value="pivotData[product.rowKey]?.[month]?.quantity || 0" @blur="(e) => handleQuantityChange(product, month, pivotData[product.rowKey][month]?.rowKey, e.target.value)">
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Add this after your existing tables -->
+    <div class="table-header">
+      <h3 class="text-lg font-semibold">Planned Production Orders</h3>
+    </div>
+
+    <table class="pivot-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+
+          <th v-for="month in uniqueMonths" :key="month">{{ month }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="product in uniqueProducts">
+          <tr :key="product.rowKey + '-starting'">
+            <td class="product-cell">{{ product.name }}</td>
+
+            <td v-for="month in uniqueMonths" :key="month" class="text-right">
+              Inv: {{ formatQuantity(plannedOrders[product.rowKey][month].startingInventory) }}
+              <br>
+              Prod: {{ formatQuantity(plannedOrders[product.rowKey][month].plannedProduction) }}
+            </td>
+          </tr>
+
+        </template>
+      </tbody>
+    </table>
+
+
+
+
+
+    <!-- 
+    <div class="table-header">
+      <h3 class="text-lg font-semibold">Raw Materials Requirements</h3>
+      <div class="grouping-toggle">
+        <label class="toggle-label">
+          <input type="checkbox" v-model="groupByProduct" class="toggle-input">
+          Group by Product
+        </label>
+      </div>
+    </div>
+
+    <table class="pivot-table">
+      <template v-if="groupByProduct">
+        <thead>
+          <tr>
+            <th>Used In</th>
+            <th>Material</th>
+            <th v-for="month in uniqueMonths" :key="month">{{ month }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="(group, productName) in groupedMaterials">
+            <tr :key="'header-' + productName" class="group-header">
+              <td colspan="2" class="product-group-header">{{ productName }}</td>
+              <td v-for="month in uniqueMonths" :key="month"></td>
+            </tr>
+            <tr v-for="material in group" :key="productName + '-' + material.rowKey">
+              <td>{{ material.usedIn.join(', ') }}</td>
+              <td class="material-cell">{{ material.name }}</td>
+              <td v-for="month in uniqueMonths" :key="month" class="text-right">
+                {{ formatQuantity(getMaterialQuantityForMonth(material, month, productName)) }}
+              </td>
+            </tr>
+            
+            <tr :key="'subtotal-' + productName" class="subtotal-row">
+              <td colspan="2" class="subtotal-cell">{{ productName }} Total</td>
+              <td v-for="month in uniqueMonths" :key="month" class="text-right font-semibold">
+                {{ formatQuantity(getProductTotalForMonth(productName, month)) }}
+              </td>
+            </tr>
+          </template>
+         
+          <tr class="total-row">
+            <td colspan="2" class="total-cell">Grand Total</td>
+            <td v-for="month in uniqueMonths" :key="month" class="text-right font-semibold">
+              {{ formatQuantity(getGrandTotalForMonth(month)) }}
+            </td>
+          </tr>
+        </tbody>
+      </template>
+      <template v-else>
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th v-for="month in uniqueMonths" :key="month">{{ month }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="material in combinedMaterials" :key="material.rowKey">
+            <td class="material-cell">{{ material.name }}</td>
+            <td v-for="month in uniqueMonths" :key="month" class="text-right">
+              {{ formatQuantity(getMaterialQuantityForMonth(material, month)) }}
+            </td>
+          </tr>
+         
+          <tr class="total-row">
+            <td class="total-cell">Total</td>
+            <td v-for="month in uniqueMonths" :key="month" class="text-right font-semibold">
+              {{ formatQuantity(getGrandTotalForMonth(month)) }}
+            </td>
+          </tr>
+        </tbody>
+      </template>
+    </table>
+ -->
+    <table class="pivot-table">
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Lead Time (Days)</th>
+          <th v-for="month in uniqueMonths" :key="month">{{ month }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="material in purchaseSchedule" :key="material.rowKey">
+          <td class="material-cell">{{ material.name }}</td>
+          <td class="text-right">{{ material.leadTime }}</td>
+          <td v-for="month in uniqueMonths" :key="month" class="text-right">
+            {{ formatQuantity(material.monthlyQuantities[month] || 0) }}
+          </td>
+        </tr>
+        <tr class="total-row">
+          <td class="total-cell" colspan="2">Total Purchase Requirements</td>
+          <td v-for="month in uniqueMonths" :key="month" class="text-right font-semibold">
+            {{ formatQuantity(getTotalPurchaseForMonth(month)) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+  </div>
+</template>
+
+
+
+<script>
+  module.exports = {
+    name: 'SalesForecastPivot2',
+
+    data() {
+      return {
+        forecastData: [],
+        nextMonth: null,
+        methodMaterials: [], // Store BOM data
+        materials: new Map(), // Cache material details
+        groupByProduct: false
+      };
+    },
+
+    computed: {
+      // Add this to the computed section of the component
+      plannedOrders() {
+        const orders = {};
+
+        // Initialize orders structure for all products and months
+        this.uniqueProducts.forEach(product => {
+          orders[product.rowKey] = {};
+          let remainingInventory = product.onHand || 0;
+
+          this.uniqueMonths.forEach(month => {
+            const forecast = this.pivotData[product.rowKey][month]?.quantity || 0;
+            const minOrderQty = product.minimumOrderQuantity || 0;
+
+            // Calculate required production quantity
+            let requiredQty = Math.max(0, forecast - remainingInventory);
+
+            // If we need to produce, ensure we meet minimum order quantity
+            let plannedQty = 0;
+            if (requiredQty > 0) {
+              plannedQty = Math.max(requiredQty, minOrderQty);
+            }
+
+            // Calculate ending inventory
+            remainingInventory = remainingInventory + plannedQty - forecast;
+
+            orders[product.rowKey][month] = {
+              startingInventory: remainingInventory + forecast - plannedQty,
+              forecast,
+              plannedProduction: plannedQty,
+              endingInventory: remainingInventory
+            };
+          });
+        });
+
+        return orders;
+      },
+
+      purchaseSchedule() {
+        const schedule = [];
+        const monthOrder = this.uniqueMonths.reduce((acc, month, index) => {
+          acc[month] = index;
+          return acc;
+        }, {});
+
+        this.combinedMaterials.forEach(material => {
+          const leadTime = material.$part.leadTime || 0;
+          const monthlyQuantities = {};
+
+          // For each month, calculate when we need to purchase
+          this.uniqueMonths.forEach(month => {
+            const requiredQuantity = this.getMaterialQuantityForMonth(material, month);
+            if (requiredQuantity === 0) return;
+
+            // Calculate which month to purchase based on lead time
+            const [monthName, year] = month.split(' ');
+            const monthDate = new Date(parseInt(year), this.monthNumbers[monthName], 1);
+            const purchaseDate = new Date(monthDate.getTime() - (leadTime * 24 * 60 * 60 * 1000));
+            const purchaseMonthName = this.reverseMonthNumbers[purchaseDate.getMonth()];
+            // Fixed template string syntax
+            const purchaseMonth = `${purchaseMonthName} ${purchaseDate.getFullYear()}`;
+
+            // If the purchase month is before our earliest month, add to first available month
+            if (!monthOrder.hasOwnProperty(purchaseMonth)) {
+              const firstMonth = this.uniqueMonths[0];
+              monthlyQuantities[firstMonth] = (monthlyQuantities[firstMonth] || 0) + requiredQuantity;
+            } else {
+              monthlyQuantities[purchaseMonth] = (monthlyQuantities[purchaseMonth] || 0) + requiredQuantity;
+            }
+          });
+
+          schedule.push({
+            ...material,
+            leadTime,
+            monthlyQuantities
+          });
+        });
+
+        return schedule.sort((a, b) => a.name.localeCompare(b.name));
+      },
+
+      monthNumbers() {
+        return {
+          'January': 0,
+          'February': 1,
+          'March': 2,
+          'April': 3,
+          'May': 4,
+          'June': 5,
+          'July': 6,
+          'July': 7,
+          'September': 8,
+          'October': 9,
+          'November': 10,
+          'December': 11
+        };
+      },
+
+      reverseMonthNumbers() {
+        return [
+          'January', 'February', 'March', 'April',
+          'May', 'June', 'July', 'August',
+          'September', 'October', 'November', 'December'
+        ];
+      },
+
+
+
+
+
+
+
+
+
+      uniqueProducts() {
+        const productsMap = new Map();
+        this.forecastData.forEach(item => {
+          if (item.$product && !productsMap.has(item.$product.rowKey)) {
+            productsMap.set(item.$product.rowKey, {
+              rowKey: item.$product.rowKey,
+              name: item.$product.name || item.$product.$displayName,
+              ...item.$product
+            });
+          }
+        });
+        return Array.from(productsMap.values());
+      },
+
+      uniqueMonths() {
+        const months = new Set();
+        this.forecastData.forEach(item => {
+          if (item['$month$MonthYear']) months.add(item['$month$MonthYear']);
+        });
+
+        const sortedMonths = Array.from(months).sort((a, b) => {
+          const [aMonth, aYear] = a.split(' ');
+          const [bMonth, bYear] = b.split(' ');
+          const monthOrder = {
+            'January': 1,
+            'February': 2,
+            'March': 3,
+            'April': 4,
+            'May': 5,
+            'June': 6,
+            'July': 7,
+            'August': 8,
+            'September': 9,
+            'October': 10,
+            'November': 11,
+            'December': 12
+          };
+
+          if (aYear !== bYear) return parseInt(aYear) - parseInt(bYear);
+          return monthOrder[aMonth] - monthOrder[bMonth];
+        });
+
+        return sortedMonths;
+      },
+
+      pivotData() {
+        const data = {};
+        this.uniqueProducts.forEach(product => {
+          data[product.rowKey] = {};
+          this.uniqueMonths.forEach(month => {
+            data[product.rowKey][month] = {
+              quantity: 0,
+              rowKey: null
+            };
+          });
+        });
+
+        this.forecastData.forEach(item => {
+          const productKey = item.$product?.rowKey;
+          const month = item['$month$MonthYear'];
+          if (productKey && month) {
+            data[productKey][month] = {
+              quantity: item.quantity || 0,
+              rowKey: item.rowKey
+            };
+          }
+        });
+        return data;
+      },
+
+      materialRequirements() {
+        const materials = new Map();
+
+        // Process each BOM entry
+        this.methodMaterials.forEach(bom => {
+          //  if (!bom.material || !bom.parentPart) return;
+          if (!this.uniqueProducts.find(p => p.rowKey === bom.parentPart)?.name) return
+
+          const materialKey = bom.rowKey;
+          if (!materials.has(materialKey)) {
+            materials.set(materialKey, {
+              rowKey: materialKey,
+              name: bom.name,
+              $part: bom.$part,
+              usedIn: new Set(),
+              usageInProducts: new Map() // Map of productRowKey -> quantityPer
+            });
+          }
+
+          const material = materials.get(materialKey);
+          const productName = this.uniqueProducts.find(p => p.rowKey === bom.parentPart)?.name;
+          if (productName) {
+            material.usedIn.add(productName);
+            material.usageInProducts.set(bom.parentPart, bom.quantityPer || 0);
+          }
+        });
+
+        // Convert to array and format for display
+        return Array.from(materials.values()).map(material => ({
+          ...material,
+          usedIn: Array.from(material.usedIn),
+          usageInProducts: material.usageInProducts
+        }));
+      },
+
+      sortedMaterials() {
+        return [...this.materialRequirements].sort((a, b) => a.name.localeCompare(b.name));
+      },
+
+      groupedMaterials() {
+        const groups = {};
+
+        this.materialRequirements.forEach(material => {
+          material.usedIn.forEach(product => {
+            if (!groups[product]) {
+              groups[product] = [];
+            }
+            groups[product].push(material);
+          });
+        });
+
+        // Sort materials within each group
+        Object.keys(groups).forEach(product => {
+          groups[product].sort((a, b) => a.name.localeCompare(b.name));
+        });
+
+        return groups;
+      },
+
+      combinedMaterials() {
+        // Get unique materials and combine their quantities
+        const materialMap = new Map();
+
+        this.materialRequirements.forEach(material => {
+          const key = material.name; // Use name as key for combining
+          if (!materialMap.has(key)) {
+            materialMap.set(key, {
+              ...material,
+              rowKey: key, // Use name as rowKey for combined materials
+              usageInProducts: new Map(material.usageInProducts)
+            });
+          } else {
+            // Combine usageInProducts maps
+            const existing = materialMap.get(key);
+            material.usageInProducts.forEach((quantity, productKey) => {
+              if (existing.usageInProducts.has(productKey)) {
+                existing.usageInProducts.set(
+                  productKey,
+                  existing.usageInProducts.get(productKey) + quantity
+                );
+              } else {
+                existing.usageInProducts.set(productKey, quantity);
+              }
+            });
+          }
+        });
+
+        return Array.from(materialMap.values()).sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+      }
+    },
+
+    methods: {
+
+      getTotalPurchaseForMonth(month) {
+        return this.purchaseSchedule.reduce((total, material) =>
+          total + (material.monthlyQuantities[month] || 0), 0
+        );
+      },
+
+
+
+
+
+      async loadData() {
+        try {
+          const [forecastGrid, materialsGrid] = await Promise.all([
+            $getGrid('forecast'),
+            $getGrid('methodMaterials')
+          ]);
+
+          this.forecastData = forecastGrid;
+          this.methodMaterials = materialsGrid;
+        } catch (error) {
+          console.error('Error loading data:', error);
+        }
+      },
+
+      getMaterialQuantityForMonth(material, month, specificProduct = null) {
+        let totalQuantity = 0;
+
+        material.usageInProducts.forEach((quantityPer, productRowKey) => {
+          const product = this.uniqueProducts.find(p => p.rowKey === productRowKey);
+
+          // If specificProduct is provided, only calculate for that product
+          if (specificProduct && product?.name !== specificProduct) {
+            return;
+          }
+
+          // Use planned production instead of forecast
+          const plannedProduction = this.plannedOrders[productRowKey]?. [month]?.plannedProduction || 0;
+          totalQuantity += plannedProduction * quantityPer;
+        });
+
+        return totalQuantity;
+      },
+
+      formatQuantity(value) {
+        return Number(value).toFixed(2);
+      },
+
+      getProductTotalForMonth(productName, month) {
+        const productMaterials = this.groupedMaterials[productName] || [];
+        return productMaterials.reduce((total, material) =>
+          total + this.getMaterialQuantityForMonth(material, month, productName), 0
+        );
+      },
+
+      getGrandTotalForMonth(month) {
+        if (this.groupByProduct) {
+          return Object.keys(this.groupedMaterials).reduce((total, productName) =>
+            total + this.getProductTotalForMonth(productName, month), 0
+          );
+        } else {
+          return this.combinedMaterials.reduce((total, material) =>
+            total + this.getMaterialQuantityForMonth(material, month), 0
+          );
+        }
+      },
+
+
+      async handleQuantityChange(product, month, rowKey, value) {
+        const [monthName, year] = month.split(' ');
+        const monthNumbers = {
+          'January': 0,
+          'February': 1,
+          'March': 2,
+          'April': 3,
+          'May': 4,
+          'June': 5,
+          'July': 6,
+          'August': 7,
+          'September': 8,
+          'October': 9,
+          'November': 10,
+          'December': 11
+        };
+
+        const monthDate = new Date(parseInt(year), monthNumbers[monthName], 1);
+
+        if (rowKey) {
+          await $dgSetRow('forecast', rowKey, {
+            quantity: parseInt(value)
+          });
+        } else {
+          const newRowData = {
+            product: product.rowKey,
+            month: monthDate,
+            quantity: parseInt(value)
+          };
+
+          const newRowKey = await $dgAddRow('forecast', newRowData);
+
+          this.forecastData.push({
+            rowKey: newRowKey,
+            $product: product,
+            month: monthDate,
+            quantity: parseInt(value),
+            $month$MonthYear: month
+          });
+        }
+      }
+
+
+    },
+
+    mounted() {
+      this.loadData();
+    }
+  };
+</script>
+
+<style scoped>
+  .forecast-pivot {
+    padding: 20px;
+  }
+
+  .add-month-btn {
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: 1px solid #ced4da;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+  }
+
+  .add-month-btn:hover {
+    background-color: #e9ecef;
+  }
+
+  .pivot-table {
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .pivot-table th {
+    background: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  .pivot-table td {
+    padding: 12px;
+    border: 1px solid #dee2e6;
+  }
+
+  .pivot-table input {
+    width: 60px;
+    padding: 4px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .pivot-table input:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, .25);
+  }
+
+  .product-cell,
+  .material-cell {
+    font-weight: 500;
+    color: #2c3e50;
+    background: #f8f9fa;
+  }
+
+  .mb-8 {
+    margin-bottom: 2rem;
+  }
+
+  .text-lg {
+    font-size: 1.125rem;
+  }
+
+  .font-semibold {
+    font-weight: 600;
+  }
+
+  .mb-4 {
+    margin-bottom: 1rem;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .grouping-toggle {
+    display: flex;
+    align-items: center;
+  }
+
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .toggle-input {
+    margin-right: 8px;
+  }
+
+  .product-group-header {
+    background-color: #edf2f7;
+    font-weight: 600;
+    padding: 8px 12px;
+  }
+
+  .group-header td {
+    border-top: 2px solid #dee2e6;
+  }
+
+
+  .total-row {
+    border-top: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+  }
+
+  .total-cell {
+    font-weight: 600;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+  }
+
+  .subtotal-row {
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+  }
+
+  .subtotal-cell {
+    font-weight: 500;
+    font-style: italic;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+  }
+</style>

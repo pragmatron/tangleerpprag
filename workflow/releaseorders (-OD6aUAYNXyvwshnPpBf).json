@@ -1,0 +1,120 @@
+{
+  "data": {
+    "metaData": {
+      "id": "-OD6aUAYNXyvwshnPpBf",
+      "statusField": ""
+    },
+    "nodes": [
+      {
+        "id": "node1733146837533",
+        "x": 336,
+        "y": 213,
+        "name": "script-task",
+        "label": "Script Task",
+        "clazz": "scriptTask",
+        "icon": {
+          "name": "terminal",
+          "color": "hsl(218, 54%, 20%)"
+        },
+        "attachment": {},
+        "outcomes": [],
+        "customWidth": 250,
+        "customHeight": 60
+      },
+      {
+        "id": "node1733146847677",
+        "x": 173.33333287920271,
+        "y": 77.3363058907645,
+        "name": "start-event",
+        "label": "Start Event",
+        "clazz": "startEvent",
+        "icon": {
+          "name": "flag",
+          "color": "hsl(154, 64%, 49%)"
+        },
+        "attachment": {},
+        "outcomes": [],
+        "customWidth": 250,
+        "customHeight": 60
+      },
+      {
+        "id": "node1733146851805",
+        "x": 727.619047164917,
+        "y": 154.47916303362166,
+        "name": "decision",
+        "label": "Decision",
+        "clazz": "decision",
+        "icon": {
+          "name": "check-circle",
+          "color": "hsl(11, 96%, 62%)"
+        },
+        "attachment": {},
+        "outcomes": [
+          {
+            "id": "outcome1733146863226",
+            "text": "error?",
+            "expression": "",
+            "idx": 1
+          },
+          {
+            "id": "outcome1733146868407",
+            "text": "no error",
+            "expression": "",
+            "idx": 2
+          }
+        ],
+        "customWidth": 250,
+        "customHeight": 60
+      }
+    ],
+    "edges": [
+      {
+        "id": "5a0dd0e0-a62d-45b5-ac26-4c5eb1be9ce3",
+        "source": "node1733146847677",
+        "target": "node1733146837533",
+        "startSocket": "bottom",
+        "endSocket": "top",
+        "label": "Start Event",
+        "targetLabel": "Script Task",
+        "style": {}
+      },
+      {
+        "id": "99ff3d5b-8a76-476f-878e-4ad415a163c6",
+        "source": "node1733146837533",
+        "target": "node1733146851805",
+        "startSocket": "right",
+        "endSocket": "left",
+        "label": "Script Task",
+        "targetLabel": "Decision",
+        "style": {}
+      },
+      {
+        "id": "11e0008a-fafe-451d-be76-922b2d9eadf8",
+        "source": "outcome1733146868407",
+        "target": "node1733146851805",
+        "startSocket": "right",
+        "endSocket": "bottom",
+        "label": "no error",
+        "targetLabel": "Decision",
+        "expression": "",
+        "style": {}
+      }
+    ],
+    "transform": {
+      "x": 34.21211641410463,
+      "y": 117.6509254645317,
+      "scale": 0.2,
+      "isAnimated": false
+    },
+    "settings": {
+      "isWorkflowTransformationEnabled": true,
+      "isNodesAlignmentEnabled": true,
+      "workflowMode": "default",
+      "isCompact": false
+    }
+  },
+  "handleAsSingleScript": true,
+  "name": "releaseorders",
+  "rootEndpoint": "orders",
+  "scheduled": false
+}

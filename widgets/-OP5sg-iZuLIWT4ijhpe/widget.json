@@ -1,0 +1,14 @@
+{
+  "dependency": "dataGrid/hurricanes",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "hurricanes"
+  },
+  "tab": "-OP5sfzbJ54AM-sTm6Zx",
+  "type": "DataGrid"
+}

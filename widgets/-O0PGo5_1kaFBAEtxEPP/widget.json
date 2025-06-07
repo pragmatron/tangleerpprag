@@ -1,0 +1,21 @@
+{
+  "classes": "",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "options": {
+    "addRecordText": "Add Work Order",
+    "view": "workOrders"
+  },
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "opportunityLines"
+  },
+  "styles": "",
+  "subtab": "-O0PGo1HoCkJiWDYNURD",
+  "tab": "-O0P6ggwL94dkCCs88Ue",
+  "title": "",
+  "type": "DataGrid"
+}

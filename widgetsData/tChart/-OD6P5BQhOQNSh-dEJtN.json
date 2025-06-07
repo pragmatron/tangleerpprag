@@ -1,0 +1,17 @@
+{
+  "chartName": "Total Line Amount by Customer",
+  "chartType": "pie",
+  "groupBy": [
+    {
+      "column": "customer",
+      "key": "-ODN-Rq5yrRtM1_ikOAK"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalLineAmount",
+      "key": "-ODN-RqjR9BgJMdNHuOa",
+      "operator": "sum"
+    }
+  ]
+}

@@ -1,0 +1,237 @@
+<template>
+  <div class="schedule-container">
+    <div class="schedule-header">
+      <h1 class="schedule-title">Project Schedule</h1>
+      <div class="date-info">{{ selectedTaskInfo }}</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th class="task-col">Task</th>
+          <th colspan="7">Week 1</th>
+          <th colspan="7">Week 2</th>
+          <th colspan="7">Week 3</th>
+        </tr>
+        <tr>
+          <th></th>
+          <template v-for="(week, weekIndex) in 3">
+            <th v-for="(day, dayIndex) in ['M', 'T', 'W', 'T', 'F', 'S', 'S']"
+                :key="`${weekIndex}-${dayIndex}`"
+                class="day-col"
+                :class="{
+                  'weekend': day === 'S',
+                  'today': isToday(weekIndex, dayIndex)
+                }">
+              {{ day }}
+            </th>
+          </template>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="(phase, phaseIndex) in uniquePhases">
+          <tr :key="`phase-${phaseIndex}`">
+            <td colspan="22" class="phase-header">{{ phase }}</td>
+          </tr>
+          <tr v-for="task in getTasksByPhase(phase)" :key="task.id">
+            <td class="task-name">{{ task.name }}</td>
+            <td colspan="21" class="timeline-cell">
+              <div class="task-timeline">
+                <vue-draggable-resizable
+                  :key="task.id"
+                  :w="getTaskWidth(task)"
+                  :x="getTaskPosition(task)"
+                  :y="0"
+                  :min-width="40"
+                  :grid="[40,48]"
+                  :parent="true"
+                  :prevent-deactivation="true"
+                  :enable-native-drag="false"
+                  class="timeline-bar"
+                  @dragging="(left, top) => onDrag(task, left)"
+                  @resizing="(left, top, width) => onResize(task, left, width)"
+                  @dragstop="(left) => updateTask(task, left, getTaskWidth(task))"
+                  @resizestop="(left, top, width) => updateTask(task, left, width)"
+                />
+              </div>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+
+module.exports = {
+  name: 'ProjectSchedule',
+
+  data() {
+    return {
+      CELL_WIDTH: 40,
+      startDate: new Date(2025, 1, 1),
+      selectedTaskInfo: '',
+      tasks: []
+    }
+  },
+
+  computed: {
+    uniquePhases() {
+      return [...new Set(this.tasks.map(task => task.phase))]
+    }
+  },
+
+  methods: {
+    getTasksByPhase(phase) {
+      return this.tasks.filter(task => task.phase === phase)
+    },
+    getDaysBetween(start, end) {
+      return Math.round((end - start) / (1000 * 60 * 60 * 24))
+    },
+    getTaskWidth(task) {
+      return this.getDaysBetween(task.startDate, task.endDate) * this.CELL_WIDTH
+    },
+    getTaskPosition(task) {
+      return this.getDaysBetween(this.startDate, task.startDate) * this.CELL_WIDTH
+    },
+    isToday(weekIndex, dayIndex) {
+      return weekIndex === 2 && dayIndex === 2
+    },
+    updateDateInfo(task, startDays, endDays) {
+      const startDate = new Date(this.startDate)
+      startDate.setDate(startDate.getDate() + startDays)
+      const endDate = new Date(this.startDate)
+      endDate.setDate(endDate.getDate() + endDays)
+      this.selectedTaskInfo = `${task.name}: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
+    },
+    onDrag(task, left) {
+      const startDays = Math.round(left / this.CELL_WIDTH)
+      const endDays = startDays + this.getDaysBetween(task.startDate, task.endDate)
+      this.updateDateInfo(task, startDays, endDays)
+    },
+    onResize(task, left, width) {
+      const startDays = Math.round(left / this.CELL_WIDTH)
+      const endDays = startDays + Math.round(width / this.CELL_WIDTH)
+      this.updateDateInfo(task, startDays, endDays)
+    },
+    updateTask(task, left, width) {
+      const startDays = Math.round(left / this.CELL_WIDTH)
+      const endDays = startDays + Math.round(width / this.CELL_WIDTH)
+
+      const startDate = new Date(this.startDate)
+      startDate.setDate(startDate.getDate() + startDays)
+      const endDate = new Date(this.startDate)
+      endDate.setDate(endDate.getDate() + endDays)
+
+      task.startDate = startDate
+      task.endDate = endDate
+    },
+    fetchTasks() {
+      const workOrders = $getGrid('workOrderOperations')
+
+      this.tasks = workOrders.map(op => ({
+        id: op._id,
+        phase: op.$workOrder$display || 'Uncategorized',
+        name: op.name,
+        startDate: new Date(op.scheduledStartDate),
+        endDate: new Date(op.scheduledEndDate)
+      }))
+    }
+  },
+
+  mounted() {
+    this.fetchTasks()
+  }
+}
+</script>
+
+<style scoped>
+.schedule-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.schedule-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+}
+
+.schedule-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.date-info {
+  color: #6b7280;
+  font-size: .875rem;
+}
+
+table {
+  width: 1040px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th, td {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background: white;
+  font-weight: 500;
+  text-align: center;
+  font-size: .875rem;
+}
+
+.task-col {
+  width: 200px;
+}
+
+.day-col {
+  width: 40px;
+  text-align: center;
+  color: #6b7280;
+  font-size: .75rem;
+}
+
+.weekend {
+  background: #f8fafc;
+}
+
+.today {
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.phase-header {
+  background: #f8fafc;
+  padding: 12px;
+  font-weight: 500;
+  font-size: .875rem;
+}
+
+.task-name {
+  padding: 12px;
+  font-size: .875rem;
+}
+
+.timeline-cell {
+  padding: 0;
+  position: relative;
+  width: 840px;
+}
+
+.task-timeline {
+  position: relative;
+  height: 48px;
+  width: 840px;
+}
+
+.timeline-bar {
+  background: #60a5

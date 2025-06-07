@@ -1,0 +1,14 @@
+{
+  "dependency": "dataGrid/notifications",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "notifications"
+  },
+  "tab": "-NhVsk7X9iaayYUiS7MR",
+  "type": "DataGrid"
+}

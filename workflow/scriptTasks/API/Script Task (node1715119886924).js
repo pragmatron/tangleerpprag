@@ -1,0 +1,9 @@
+
+context.data = {status:'cool'}
+
+
+
+
+
+
+

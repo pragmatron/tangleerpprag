@@ -1,0 +1,35 @@
+{
+  "cartProductList": [
+    {
+      "name": "18 Inch Cross Arm Wood Pole Bracket",
+      "price": 153,
+      "qty": 5,
+      "src": {
+        "fileName": "780afb20-e121-11ee-930c-e908193694da_18 Inch Single Cross Arm Wood Pole Bracket, 2 Inch Diameter Steel Pipe.jpeg",
+        "url": "https://firebasestorage.googleapis.com/v0/b/tangledev00.appspot.com/o/-Nnj6gGspBmEsMcC7I1t%2F780afb20-e121-11ee-930c-e908193694da_18%20Inch%20Single%20Cross%20Arm%20Wood%20Pole%20Bracket%2C%202%20Inch%20Diameter%20Steel%20Pipe.jpeg?alt=media&token=a52e847a-cda8-4de2-a15c-7e5747e6dcaa"
+      }
+    },
+    {
+      "name": "1 Arm Wrap Around Bracket",
+      "price": 187,
+      "qty": 1,
+      "src": {
+        "fileName": "90ea7940-e121-11ee-930c-e908193694da_1 Arm Wrap Around Bracket for Wood Poles with 10-13 Inch Diameter.jpeg",
+        "url": "https://firebasestorage.googleapis.com/v0/b/tangledev00.appspot.com/o/-Nnj6gGspBmEsMcC7I1t%2F90ea7940-e121-11ee-930c-e908193694da_1%20Arm%20Wrap%20Around%20Bracket%20for%20Wood%20Poles%20with%2010-13%20Inch%20Diameter.jpeg?alt=media&token=4ab0346e-2132-4993-9714-450090b1ddbc"
+      }
+    }
+  ],
+  "checklistHeader-_lastTabs": "default",
+  "notifications-_lastTabs": "default",
+  "opportunityLines-OAIerRq4Ignl2qACk1X_lastViews": "workOrders",
+  "test": {
+    "calculationType": [
+      "sum",
+      "formula"
+    ],
+    "customFormula": "",
+    "selectedGroupings": [
+      "month"
+    ]
+  }
+}

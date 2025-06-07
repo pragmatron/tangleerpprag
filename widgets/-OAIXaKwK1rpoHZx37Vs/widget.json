@@ -1,0 +1,17 @@
+{
+  "container": "-NZQRU_mbW8LryW8SLuv",
+  "gsOptions": {
+    "h": 4,
+    "w": 24,
+    "x": 0,
+    "y": 0
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "workOrders"
+  },
+  "subtab": "-NZQRNzG4GCl_3_CgC6h",
+  "tab": "-NZl1GT89ekLN8eDvSEE",
+  "type": "DataGrid"
+}

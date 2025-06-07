@@ -1,0 +1,17 @@
+{
+  "chartName": "Sales Lines by Customer",
+  "chartType": "bar",
+  "groupBy": [
+    {
+      "column": "customer",
+      "key": "-OMNrapHICQMQ5f1pG8i"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalLineAmount",
+      "key": "-OMNrapHICQMQ5f1pG8h",
+      "operator": "sum"
+    }
+  ]
+}

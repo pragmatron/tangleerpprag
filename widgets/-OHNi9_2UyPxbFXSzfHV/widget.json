@@ -1,0 +1,14 @@
+{
+  "dependency": "dataGrid/customerTasks",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "customerTasks"
+  },
+  "tab": "-OHNi9WxkzlVBuD8YZdF",
+  "type": "DataGrid"
+}

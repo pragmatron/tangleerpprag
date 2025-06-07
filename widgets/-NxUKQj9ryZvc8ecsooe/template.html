@@ -1,0 +1,83 @@
+<template>
+  <div class="print-container">
+    <!-- Button Section -->
+    <div class="print-button-container">
+      <b-spinner
+        variant="primary"
+        class="print-spinner"
+        v-if="$getGlobalModel('printingWorkOrders')"
+      />
+      <b-button
+        v-else
+        @click="printMultipleWorkOrders()"
+        variant="primary"
+        size="lg"
+        class="print-button"
+      >
+        Print Multiple Work Orders
+      </b-button>
+    </div>
+
+    <!-- Instructions Section -->
+    <h3 class="print-instructions">
+      Select Which Rows You Would Like to Print
+    </h3>
+  </div>
+</template>
+
+<style scoped>
+.print-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; /* Align content to the left */
+  padding: 15px;
+  box-shadow: none; /* Removed shadow */
+  max-width: 600px;
+  height: auto; /* Adjust height dynamically */
+  margin: 0; /* Remove extra margins */
+  background-color: transparent; /* No background color */
+}
+
+.print-button-container {
+  display: flex;
+  justify-content: flex-start; /* Align button to the left */
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.print-button {
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 8px 16px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #5297FF, #3877CC); /* Modern gradient */
+  border: none; /* Removed border */
+  color: #fff; /* White text */
+  width: 100%;
+  max-width: 350px; /* Adjusted width */
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+  transition: all 0.3s ease;
+}
+
+.print-button:hover {
+  background: linear-gradient(90deg, #3877CC, #285799); /* Darker gradient on hover */
+  transform: scale(1.02); /* Slight hover scale */
+}
+
+.print-spinner {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.print-instructions {
+  margin: 5px 0 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #343a40;
+  text-align: left;
+  max-width: 350px;
+}
+</style>
+

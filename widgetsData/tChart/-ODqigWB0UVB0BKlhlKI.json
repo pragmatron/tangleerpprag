@@ -1,0 +1,17 @@
+{
+  "chartName": "Total Sales by Customer",
+  "chartType": "horizontalBar",
+  "groupBy": [
+    {
+      "column": "soldToCustomer",
+      "key": "-ODqigWB0UVB0BKlhlKH"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalQuoteLinePrice",
+      "key": "-ODqigWB0UVB0BKlhlKG",
+      "operator": "sum"
+    }
+  ]
+}

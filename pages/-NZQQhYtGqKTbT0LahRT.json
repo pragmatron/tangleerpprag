@@ -1,0 +1,9 @@
+{
+  "expandedByDefault": false,
+  "icon": {
+    "color": "rgba(54, 162, 235, 1)",
+    "name": "grav"
+  },
+  "order": 5,
+  "title": "Sales"
+}

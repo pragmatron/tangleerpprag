@@ -1,0 +1,77 @@
+.sortable-inner-component {
+    padding: 0px 4px !important;
+    margin-right: 0px !important;
+}
+.board-component__cell {
+    width: auto !important;
+    white-space: nowrap !important;
+    padding: 0px !important;
+    margin: 0px !important;
+}
+#dailyProdTxt {
+    font-size: 12px; 
+    padding: 0px 8px;  
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);  
+    max-width: 400px; 
+    margin: 0px !important;
+}
+
+.board-component {
+    width: 1340px !important;
+    max-width: 2000px !important;
+    height: 1000px !important;
+    max-height: 2000px !important;
+}
+
+.sortable-container sortable sortable-container--with-header ui-sortable {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+.sortable-inner-component sortable-item {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+
+.sortable-inner-component__dynamicTemplate {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;    
+}
+
+.sortable-inner-component {
+    box-shadow: none !important;
+}
+
+.sortable-inner-component__open_detail {
+    display: block;
+    width: 20px !important;
+    height: 20px !important;
+    align-content: center;
+    text-align: center;
+    align-items: center;
+    margin-right: 12px !important;
+    color: white;
+    background:#5297ff;
+    border-radius: 5px;
+    transition: 0.15s all ease-in-out;
+    margin-top: 10px !important;
+    margin-bottom: -5px !important;
+    transform: scale(0.8);
+}
+
+.sortable-inner-component__open_detail:hover {
+    background:#1f79ff;
+}
+
+.fa fa-pencil {
+    margin-bottom: 3px !important;
+}
+
+.sortable-inner-component.sortable-item.ui-sortable-handle {
+    margin-bottom: 0px !important;
+    margin-top: 0px !important;
+    padding: 0px !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0.2) !important;
+}
+
+

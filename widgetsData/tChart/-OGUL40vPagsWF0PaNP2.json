@@ -1,0 +1,17 @@
+{
+  "chartName": "Orders Total Amount by Customer",
+  "chartType": "bar",
+  "groupBy": [
+    {
+      "column": "soldToCustomer",
+      "key": "-OGUL40vPagsWF0PaNP1"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalOrderCommission",
+      "key": "-OGUL40vPagsWF0PaNP0",
+      "operator": "sum"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "classes": "",
+  "container": "-NehHMQDzEtq0iVKwvIq",
+  "gsOptions": {
+    "h": 1,
+    "w": 24,
+    "x": 0,
+    "y": 0
+  },
+  "layout": "b-card",
+  "options": {
+    "addRecordText": "Add Sales Line",
+    "availableViews": [
+      "salesLines"
+    ],
+    "disableViewsControl": true,
+    "view": "salesLines"
+  },
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "opportunityLines"
+  },
+  "styles": "",
+  "subtab": "-NZQRNzG4GCl_3_CgC6h",
+  "tab": "-NZl1GT89ekLN8eDvSEE",
+  "title": "",
+  "type": "DataGrid"
+}

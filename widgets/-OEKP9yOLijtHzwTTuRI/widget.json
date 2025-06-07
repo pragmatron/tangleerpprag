@@ -1,0 +1,17 @@
+{
+  "dependency": "dataGrid/forecast",
+  "gsOptions": {
+    "h": 7,
+    "w": 24,
+    "x": 0,
+    "y": 16
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "forecast"
+  },
+  "subtab": "-OEJKC3goI4VvDxBjbF2",
+  "tab": "-NZQQhYtGqKTbT0LahRT",
+  "type": "DataGrid"
+}

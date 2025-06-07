@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/timeEntries",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "timeEntries"
+  },
+  "subtab": "-NeOcvb0QvHGr14Vh4Va",
+  "tab": "-NZl1GT89ekLN8eDvSEE",
+  "type": "DataGrid"
+}

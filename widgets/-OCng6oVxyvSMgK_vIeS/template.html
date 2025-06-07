@@ -1,0 +1,82 @@
+<template>
+  <div class="print-container">
+    <!-- Button Section -->
+    <div class="print-button-container">
+      <b-spinner
+        variant="primary"
+        class="print-spinner"
+        v-if="$getGlobalModel('printingShipments')"
+      />
+      <b-button
+        v-else
+        @click="printMultipleShipments()"
+        variant="primary"
+        size="lg"
+        class="print-button"
+      >
+        Print Multiple Shipments
+      </b-button>
+    </div>
+
+    <!-- Instructions Section -->
+    <h3 class="print-instructions">
+      Select Which Rows You Would Like to Print
+    </h3>
+  </div>
+</template>
+
+<style scoped>
+.print-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px; /* Further reduced padding */
+  border: 2px solid #5297FF; /* Updated blue border */
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  max-width: 600px;
+  height: 120px; /* Reduced height for a tighter layout */
+  margin: 5px auto; /* Reduced top and bottom margins */
+  background-color: white; /* Clean white background */
+}
+
+.print-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3px; /* Minimal space between button and instructions */
+}
+
+.print-button {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 8px 16px; /* Reduced button padding */
+  text-transform: uppercase;
+  background-color: #5297FF; /* New primary blue */
+  border-color: #5297FF; /* Match button border */
+  color: #fff; /* White text */
+  width: 100%; /* Full width of the container */
+  max-width: 350px; /* Restrict button width */
+  border-radius: 5px; /* Slightly rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+.print-button:hover {
+  background-color: #3877CC; /* Darker blue for hover effect */
+  border-color: #3877CC;
+}
+
+.print-spinner {
+  width: 2rem;
+  height: 2rem;
+}
+
+.print-instructions {
+  margin: 3px 0 0; /* Reduced margin for instructions */
+  font-size: 1.1rem; /* Slightly smaller font */
+  font-weight: bold;
+  color: #343a40; /* Dark gray */
+  text-align: center;
+}
+</style>

@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/shipmentStatus",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "shipmentStatus"
+  },
+  "subtab": "-OQmpxWxjy8jf5oM999H",
+  "tab": "-NZQRbcH19LNNooOkTCU",
+  "type": "DataGrid"
+}

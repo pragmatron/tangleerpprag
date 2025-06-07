@@ -1,0 +1,27 @@
+{
+  "chartName": "Sales Line Totals by Customer",
+  "chartType": "bar",
+  "colorPalette": {
+    "colorPalette": {
+      "label": "Rainbow",
+      "value": "rainbow"
+    }
+  },
+  "groupBy": [
+    {
+      "column": "country",
+      "key": "-OKgcczWvm6lCsu6ZALI"
+    },
+    {
+      "column": "customer",
+      "key": "-OKgcczWvm6lCsu6ZALJ"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalLineAmount",
+      "key": "-OKgccywMsvpypjM0KL_",
+      "operator": "sum"
+    }
+  ]
+}

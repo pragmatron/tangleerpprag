@@ -1,0 +1,20 @@
+{
+  "chartName": "Sales Lines Total by Salesperson",
+  "chartType": "line",
+  "groupBy": [
+    {
+      "column": "calctest",
+      "key": "-OCYydTqhXhQ8JwhWCZB"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalLineAmount",
+      "key": "-OCYydUaDEZF9xuSno7s",
+      "operator": "sum"
+    }
+  ],
+  "stackedMetrics": {
+    "stacked": false
+  }
+}

@@ -1,0 +1,464 @@
+<template>
+  <div class="container">
+    <!-- Login Screen -->
+    <div v-if="!loggedIn" class="login-screen">
+      <h2>Employee Login</h2>
+      <div style="display: flex; flex-direction: row;">
+        <b-form-input
+          type="password"
+          v-model="typedInPin"
+          placeholder="Enter PIN"
+        ></b-form-input>
+        <b-button variant="primary" @click="login">Login</b-button>
+      </div>
+      <p v-if="loginError" class="error-message">{{ loginError }}</p>
+    </div>
+
+    <!-- Main Screen (Sales Orders, Work Orders, etc.) -->
+    <div v-else>
+      <!-- Sales Orders Section -->
+      <div v-if="!selectedSalesOrder" class="sales-orders-section">
+        <div class="header">
+          <h2>Sales Orders</h2>
+          <p>Logged in as: {{ employeeName }}</p>
+          <b-button variant="secondary" @click="logout">Back to Login</b-button>
+        </div>
+        <div class="scrollable-container">
+          <div class="search-container">
+            <b-form-input v-model="searchQuery" placeholder="Search by Sales Order" />
+          </div>
+          <div class="cards-wrapper">
+            <div
+              v-for="(order, index) in filteredSalesOrders"
+              :key="index"
+              class="cards-container"
+              @click="selectSalesOrder(order)"
+            >
+              <div class="sales-order-item">
+                <h3>{{ order.name }}</h3>
+                <p><strong>Customer:</strong> {{ order.$soldToCustomer$display }}</p>
+                <p><strong>Due Date:</strong> {{ formatDate(order.dueDate) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Orders Section -->
+      <div v-else-if="selectedSalesOrder && !selectedWorkOrder" class="work-orders-section">
+        <div class="header">
+          <b-button variant="secondary" @click="deselectSalesOrder">Back to Sales Orders</b-button>
+          <h2>Work Orders for {{ selectedSalesOrder.name }}</h2>
+        </div>
+        <div class="scrollable-container">
+          <div class="search-container">
+            <b-form-input v-model="workOrderSearch" placeholder="Search by WO Name" />
+          </div>
+          <div class="cards-wrapper">
+            <div
+              v-for="(workOrder, index) in filteredWorkOrders"
+              :key="index"
+              class="cards-container"
+              @click="selectWorkOrder(workOrder)"
+            >
+              <div class="work-order-item">
+                <h3>{{ workOrder.name }}</h3>
+                <p><strong>Part:</strong> {{ workOrder.$part$display }}</p>
+                <p><strong>Customer:</strong> {{ workOrder.$customer$display }}</p>
+                <p><strong>Due Date:</strong> {{ formatDate(workOrder.dueDate) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operations Section -->
+      <div v-else-if="selectedWorkOrder" class="operations-section">
+        <div class="header">
+          <b-button variant="secondary" @click="deselectWorkOrder">Back to Work Orders</b-button>
+          <h2>Operations for {{ selectedWorkOrder.name }}</h2>
+        </div>
+
+        <div class="filters-section">
+          <v-select v-model="selectedPart" :options="partOptions" placeholder="Filter by Part"></v-select>
+        </div>
+
+        <div class="operations-list">
+          <div class="cards-wrapper">
+            <div v-for="(operation, index) in filteredOperations" :key="index" class="cards-container">
+              <div class="operation-item">
+                <h4>{{ operation.name }}</h4>
+                <p><strong>Current Employee:</strong> {{ operation.$currentEmployee$display || 'None' }}</p>
+                <p>
+                  <strong>Status:</strong>
+                  <span>
+                    {{ operation.completed ? 'Completed' : operation.active ? 'In Progress' : 'Pending' }}
+                  </span>
+                </p>
+              </div>
+              <div class="operation-actions">
+                <b-button 
+                  @click="$dgShowEditRowModal('workOrderOperations', operation.rowKey, {formLayout:'-Ne8cXE6Zf5-_3EQIdzP'})" 
+                  variant="success"
+                >
+                  Open
+                </b-button>
+                <b-button
+                  v-if="!operation.currentEmployee"
+                  @click="startOperation(operation)"
+                  :disabled="!canStartOperation(operation) || (operation.currentEmployee && operation.currentEmployee !== loggedInEmployee.rowKey)"
+                  variant="success"
+                >
+                  Start
+                </b-button>
+                <b-button
+                  v-else
+                  @click="stopOperation(operation)"
+                  :disabled="operation.currentEmployee !== loggedInEmployee.rowKey"
+                  variant="danger"
+                >
+                  Stop
+                </b-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+module.exports = {
+  data() {
+    return {
+      // Login-related fields
+      loggedIn: false,
+      typedInPin: '',
+      employeeName: '',
+      employeeDepartment: '',
+      loginError: '',
+      loggedInEmployee: null,
+      // Existing fields
+      salesOrders: [],
+      workOrders: [],
+      operations: [],
+      selectedSalesOrder: null,
+      selectedWorkOrder: null,
+      activeDepartment: null,
+      selectedPart: null,
+      searchQuery: '',
+      workOrderSearch: '',
+    };
+  },
+  computed: {
+    filteredSalesOrders() {
+      let filtered = this.salesOrders;
+
+      if (this.searchQuery) {
+        filtered = filtered.filter(order =>
+          order.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      }
+
+      return filtered;
+    },
+
+    filteredWorkOrders() {
+      let filtered = this.workOrders;
+
+      if (this.activeDepartment) {
+        const allOperations = $getGrid('workOrderOperations');
+        
+        filtered = filtered.filter(wo => {
+          const opsForWo = allOperations.filter(op => op.workOrder === wo.rowKey);
+          return opsForWo.some(op => op.departments === this.activeDepartment.code);
+        });
+      }
+
+      if (this.workOrderSearch) {
+        filtered = filtered.filter(order =>
+          order.name.toLowerCase().includes(this.workOrderSearch.toLowerCase())
+        );
+      }
+
+      return filtered;
+    },
+
+    filteredOperations() {
+      let filtered = $getGrid('workOrderOperations')
+        .filter(op => op.workOrder === this.selectedWorkOrder.rowKey);
+      
+      if(this.activeDepartment) {
+        filtered = filtered.filter(op => op.departments === this.activeDepartment.code)
+      }
+      
+      if (this.selectedPart) {
+        filtered = filtered.filter(op => op.part === this.selectedPart);
+      }
+
+      return filtered;
+    },
+
+    partOptions() {
+      return [...new Set(this.operations.map(op => op.part))];
+    },
+  },
+  mounted() {
+    this.loadSalesOrders();
+  },
+  methods: {
+     login() {
+      console.log('this.typedpin: ', this.typedInPin)
+      const matchingEmployee = $getGrid('employees').filter(
+        employee => employee.pin == this.typedInPin
+      );
+      console.log('matchingEmployee: ', matchingEmployee)
+      if (matchingEmployee.length > 0) {
+        this.loggedIn = true;
+        const emp = matchingEmployee[0];
+        this.loggedInEmployee = emp
+        this.employeeName = emp.name || 'Unknown User';
+        this.loginError = '';
+        this.typedInPin = '';
+        this.loadSalesOrders();
+      } else {
+        this.loginError = 'Invalid PIN. Please try again.';
+        this.typedInPin = '';
+      }
+    },
+
+    formatDate(dateString) {
+      if (!dateString) {
+        return 'No due date set';
+      }
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    },
+
+    loadSalesOrders() {
+      const allSalesOrders = $getGrid('opportunities');
+      this.salesOrders = allSalesOrders;
+      return allSalesOrders;
+    },
+
+    selectSalesOrder(order) {
+      this.selectedSalesOrder = order;
+      this.loadWorkOrders(order.rowKey);
+      this.selectedWorkOrder = null;
+      this.operations = [];
+    },
+
+    logout() {
+      this.loggedIn = false;
+      this.loggedInEmployee = null;
+    },
+
+    deselectSalesOrder() {
+      this.selectedSalesOrder = null;
+      this.workOrders = [];
+      this.selectedWorkOrder = null;
+      this.operations = [];
+      this.workOrderSearch = '';
+    },
+
+    loadWorkOrders(salesOrderId) {
+      this.workOrders = $getGrid('opportunityLines')
+        .filter(wo => {
+          if (wo.salesOrder !== salesOrderId) return false;
+          return !wo.completed && wo.salesOrder == salesOrderId;
+        });
+    },
+
+    selectWorkOrder(workOrder) {
+      this.selectedWorkOrder = workOrder;
+      this.loadOperations(workOrder.rowKey);
+    },
+
+    deselectWorkOrder() {
+      this.selectedWorkOrder = null;
+      this.operations = [];
+      this.selectedPart = null;
+    },
+
+    loadOperations(workOrderId) {
+      this.operations = $getGrid('workOrderOperations').filter(op => op.workOrder === workOrderId);
+    },
+
+    async startOperation(operation) {
+      try {
+        await $dgSetRowVals('workOrderOperations', operation.rowKey, {
+          active: true,
+          currentEmployee: this.loggedInEmployee.rowKey
+        });
+
+        let checkActiveTimeCard = $getGrid('timeCards').find((f) => f.activeTimeCard);
+
+        if(checkActiveTimeCard) {
+          let newTimeEntry = await $dgAddRow('timeEntries', {
+            timeCards: checkActiveTimeCard.rowKey,
+            employee: this.loggedInEmployee.rowKey,
+            started: Date.now(),
+            workOrderOperation: operation.rowKey,
+            workOrder: operation.workOrder,
+          });
+        } else {
+          let newTimeCard = await $dgAddRow('timeCards', {
+            employee: this.loggedInEmployee.rowKey,
+            started: Date.now(),
+            activeTimeCard: true
+          });
+
+          let newTimeEntry = await $dgAddRow('timeEntries', {
+            timeCards: newTimeCard,
+            employee: this.loggedInEmployee.rowKey,
+            started: Date.now(),
+            workOrderOperation: operation.rowKey,
+            workOrder: operation.workOrder,
+          });
+        }
+
+        this.$bvToast.toast('Time entry created successfully', {
+          title: 'Success',
+          variant: 'success',
+          solid: true
+        });
+      } catch (error) {
+        console.error('Error starting operation:', error);
+        this.$bvToast.toast('Error starting operation', {
+          title: 'Error',
+          variant: 'danger',
+          solid: true
+        });
+      }
+    },
+
+    async stopOperation(operation) {
+      try {
+        await $dgSetRowVals('workOrderOperations', operation.rowKey, {
+          active: false,
+          currentEmployee: null
+        });
+        
+        const activeTimeEntry = $getGrid('timeEntries').find(
+          entry => entry.workOrderOperation === operation.rowKey && !entry.ended
+        );
+        
+        if (activeTimeEntry) {
+          await $dgSetRowVals('timeEntries', activeTimeEntry.rowKey, {
+            stopped: Date.now()
+          });
+        }
+        
+        this.$bvToast.toast('Operation stopped successfully', {
+          title: 'Success',
+          variant: 'success',
+          solid: true
+        });
+      } catch (error) {
+        console.error('Error stopping operation:', error);
+        this.$bvToast.toast('Error stopping operation', {
+          title: 'Error',
+          variant: 'danger',
+          solid: true
+        });
+      }
+    },
+
+    canStartOperation(operation) {
+      if (operation.completed) return false;
+      const previousOperation = this.operations
+        .filter(op => op.sequence < operation.sequence)
+        .sort((a, b) => b.sequence - a.sequence)[0];
+      if (!previousOperation) return true;
+      return previousOperation.completed;
+    },
+  },
+};
+</script>
+
+<style scoped>
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+  }
+
+  .login-screen {
+    max-width: 300px;
+    margin: auto;
+    text-align: center;
+  }
+
+  .login-screen .error-message {
+    color: red;
+    margin-top: 10px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .header h2 {
+    color: #0056b3;
+  }
+
+  .sales-orders-section,
+  .work-orders-section,
+  .operations-section {
+    flex: 1;
+  }
+
+  .scrollable-container {
+    overflow-y: auto;
+    background-color: #ffffff;
+    padding: 10px;
+    border: 1px #e9ecef solid;
+    border-radius: 5px;
+    max-height: calc(100vh - 150px);
+  }
+
+  .cards-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .cards-container {
+    background-color: #007bff;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: calc(33.333% - 10px);
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .cards-container:hover {
+    background-color: #0056b3;
+    transform: translateY(-5px);
+  }
+
+  .search-container b-form-input {
+    border: 1px solid #ccc;
+  }
+
+  .operation-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  }
+</style>

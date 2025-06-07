@@ -1,0 +1,18 @@
+{
+  "chartName": "Work Orders Completed Per Customer",
+  "chartType": "bar",
+  "groupBy": [
+    {
+      "column": "customer",
+      "key": "-OOZFjtWkyJUZaFOIEGa"
+    }
+  ],
+  "metrics": [
+    {
+      "chartType": "bar",
+      "column": "completed",
+      "key": "-OOZFm1vR5x8R-Hd8BYH",
+      "operator": "sum"
+    }
+  ]
+}

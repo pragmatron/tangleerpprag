@@ -1,0 +1,17 @@
+{
+  "dataSource": "opportunityLines",
+  "gsOptions": {
+    "adjustLayoutPosition": {
+      "-ODGg7EDth_B1eyEVvxB": {
+        "h": 6,
+        "w": 12,
+        "x": 6,
+        "y": 0
+      }
+    },
+    "droppedItemWidgetKey": "-ODGg7EDth_B1eyEVvxB"
+  },
+  "subTab": "-OCeFzRGmOaC2IPKJf2N",
+  "tab": "-NZQQhYtGqKTbT0LahRT",
+  "template": "<u-groupedSummary table-name=\"workOrders\" :filtered-records='filteredRecords'></u-groupedSummary>"
+}

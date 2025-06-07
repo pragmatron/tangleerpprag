@@ -1,0 +1,586 @@
+<template>
+  <div class="container">
+    <!-- Login Screen -->
+    <b-button 
+      v-if="!loggedIn"
+      variant="outline-primary" 
+      class="mb-3" 
+      style="max-width: 200px;"
+      @click="isPinLogin = !isPinLogin"
+    >
+      Switch to {{ isPinLogin ? 'Name Selection' : 'PIN Entry' }}
+    </b-button>
+    <div v-if="!loggedIn" class="login-screen">
+      <h2>Employee Login</h2>
+      
+      <!-- PIN Login -->
+      <div v-if="isPinLogin" class="pin-login">
+        <div style="display: flex; flex-direction: row;">
+          <b-form-input
+            type="password"
+            v-model="typedInPin"
+            placeholder="Enter PIN"
+          ></b-form-input>
+          <b-button variant="primary" @click="login">Login</b-button>
+        </div>
+      </div>
+
+      <!-- Name Selection Login -->
+      <div v-else class="name-login">
+        <div class="employee-grid">
+          <div
+            v-for="employee in employees"
+            :key="employee.rowKey"
+            class="employee-card"
+            @click="loginWithEmployee(employee)"
+          >
+            <div class="employee-name">{{ employee.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <p v-if="loginError" class="error-message">{{ loginError }}</p>
+    </div>
+
+    <!-- Main Screen (Sales Orders, Work Orders, etc.) -->
+    <div v-else>
+      <!-- Sales Orders Section -->
+      <div v-if="!selectedSalesOrder" class="sales-orders-section">
+        <div class="header">
+          <h2>Sales Orders</h2>
+          <p>Logged in as: {{ employeeName }}</p>
+          <b-button variant="secondary" @click="logout">Back to Login</b-button>
+        </div>
+        <div class="scrollable-container">
+          <div class="search-container">
+            <b-form-input v-model="searchQuery" placeholder="Search by Sales Order" />
+          </div>
+          <div class="cards-wrapper">
+            <div
+              v-for="(order, index) in filteredSalesOrders"
+              :key="index"
+              class="cards-container"
+              @click="selectSalesOrder(order)"
+            >
+              <div class="sales-order-item">
+                <h3>{{ order.name }}</h3>
+                <p><strong>Customer:</strong> {{ order.$soldToCustomer$display }}</p>
+                <p><strong>Due Date:</strong> {{ formatDate(order.dueDate) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Orders Section -->
+      <div v-else-if="selectedSalesOrder && !selectedWorkOrder" class="work-orders-section">
+        <div class="header">
+          <b-button variant="secondary" @click="deselectSalesOrder">Back to Sales Orders</b-button>
+          <h2>Work Orders for {{ selectedSalesOrder.name }}</h2>
+        </div>
+        <div class="scrollable-container">
+          <div class="search-container">
+            <b-form-input v-model="workOrderSearch" placeholder="Search by WO Name" />
+          </div>
+          <div class="cards-wrapper">
+            <div
+              v-for="(workOrder, index) in filteredWorkOrders"
+              :key="index"
+              class="cards-container"
+              @click="selectWorkOrder(workOrder)"
+            >
+              <div class="work-order-item">
+                <h3>{{ workOrder.name }}</h3>
+                <p><strong>Part:</strong> {{ workOrder.$part$display }}</p>
+                <p><strong>Customer:</strong> {{ workOrder.$customer$display }}</p>
+                <p><strong>Due Date:</strong> {{ formatDate(workOrder.dueDate) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operations Section -->
+      <div v-else-if="selectedWorkOrder" class="operations-section">
+        <div class="header mb-4">
+          <b-button variant="secondary" @click="deselectWorkOrder">Back to Work Orders</b-button>
+          <h2>Operations for {{ selectedWorkOrder.name }}</h2>
+        </div>
+
+        <div class="filters-section mb-4">
+          <v-select v-model="selectedPart" :options="partOptions" placeholder="Filter by Part"></v-select>
+        </div>
+<div class="operations-list">
+  <b-row>
+    <b-col v-for="(operation, index) in filteredOperations" 
+           :key="index" 
+           xl="4"    
+           lg="6"    
+           sm="12"  
+           class="mb-3">
+      <b-card
+        class="h-100 border-primary border-left-4"
+        no-body
+      >
+        <!-- Card Header -->
+        <b-card-header class="bg-light py-2">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="d-flex align-items-center">
+                <small class="text-muted mr-2">{{ operation.name }}</small>
+              </div>
+              <h5 class="mt-1 mb-0 font-monospace">{{ operation.$resource$display }}</h5>
+            </div>
+            <div>
+              <b-button
+                @click="operation.currentEmployee ? stopOperation(operation) : startOperation(operation)"
+                :variant="operation.currentEmployee ? 'danger' : 'success'"
+                class="p-2"
+                :disabled="!canStartOperation(operation) || 
+                          (operation.currentEmployee && operation.currentEmployee !== loggedInEmployee.rowKey)"
+              >
+                <i :class="operation.currentEmployee ? 'fas fa-pause' : 'fas fa-play'"></i>
+              </b-button>
+            </div>
+          </div>
+        </b-card-header>
+
+                <!-- Card Body -->
+                <b-card-body class="pt-3">
+                  <div class="mb-3">
+                    <h4 class="h5 font-weight-bold text-dark">{{ operation.name }}</h4>
+                    <div class="d-flex align-items-center mt-2">
+                      <div class="status-indicator"
+                           :class="{'bg-success': operation.currentEmployee, 'bg-danger': !operation.currentEmployee}">
+                      </div>
+                      <span class="ml-2 font-weight-medium text-capitalize">
+                        {{ operation.currentEmployee ? 'Running' : 'Stopped' }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex flex-wrap align-items-center mb-3 gap-3">
+                    <div class="d-flex align-items-center mr-3">
+                      <i class="fas fa-user text-muted mr-2"></i>
+                      <span class="font-weight-medium text-secondary">
+                        {{ operation.$currentEmployee$display || 'No operator' }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Status Alert -->
+                  <div v-if="operation.completed" 
+                       class="alert alert-success d-flex align-items-center py-2 px-3 mb-0">
+                    <i class="fas fa-check mr-2"></i>
+                    <span class="font-weight-medium">Completed</span>
+                  </div>
+                  <div v-else-if="!canStartOperation(operation)"
+                       class="alert alert-warning d-flex align-items-center py-2 px-3 mb-0">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <span class="font-weight-medium">Waiting for previous operation</span>
+                  </div>
+                </b-card-body>
+              </b-card>
+            </b-col>
+          </b-row>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+module.exports = {
+  data() {
+    return {
+      isPinLogin: true,
+      employees: [],
+      loggedIn: false,
+      typedInPin: '',
+      employeeName: '',
+      employeeDepartment: '',
+      loginError: '',
+      loggedInEmployee: null,
+      salesOrders: [],
+      workOrders: [],
+      operations: [],
+      selectedSalesOrder: null,
+      selectedWorkOrder: null,
+      activeDepartment: null,
+      selectedPart: null,
+      searchQuery: '',
+      workOrderSearch: '',
+    };
+  },
+  mounted() {
+    this.loadEmployees();
+    this.loadSalesOrders();
+  },
+  computed: {
+    filteredSalesOrders() {
+      let filtered = this.salesOrders;
+      if (this.searchQuery) {
+        filtered = filtered.filter(order =>
+          order.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      }
+      return filtered;
+    },
+    filteredWorkOrders() {
+      let filtered = this.workOrders;
+      if (this.activeDepartment) {
+        const allOperations = $getGrid('workOrderOperations');
+        filtered = filtered.filter(wo => {
+          const opsForWo = allOperations.filter(op => op.workOrder === wo.rowKey);
+          return opsForWo.some(op => op.departments === this.activeDepartment.code);
+        });
+      }
+      if (this.workOrderSearch) {
+        filtered = filtered.filter(order =>
+          order.name.toLowerCase().includes(this.workOrderSearch.toLowerCase())
+        );
+      }
+      return filtered;
+    },
+    filteredOperations() {
+      let filtered = $getGrid('workOrderOperations')
+        .filter(op => op.workOrder === this.selectedWorkOrder.rowKey);
+      if(this.activeDepartment) {
+        filtered = filtered.filter(op => op.departments === this.activeDepartment.code)
+      }
+      if (this.selectedPart) {
+        filtered = filtered.filter(op => op.part === this.selectedPart);
+      }
+      return filtered;
+    },
+    partOptions() {
+      return [...new Set(this.operations.map(op => op.part))];
+    },
+  },
+  methods: {
+    loadEmployees() {
+      this.employees = $getGrid('employees');
+    },
+    loginWithEmployee(employee) {
+      this.loggedIn = true;
+      this.loggedInEmployee = employee;
+      this.employeeName = employee.name || 'Unknown User';
+      this.loginError = '';
+      this.loadSalesOrders();
+    },
+    login() {
+      console.log('this.typedpin: ', this.typedInPin)
+      const matchingEmployee = $getGrid('employees').filter(
+        employee => employee.pin == this.typedInPin
+      );
+      console.log('matchingEmployee: ', matchingEmployee)
+      if (matchingEmployee.length > 0) {
+        this.loggedIn = true;
+        const emp = matchingEmployee[0];
+        this.loggedInEmployee = emp
+        this.employeeName = emp.name || 'Unknown User';
+        this.loginError = '';
+        this.typedInPin = '';
+        this.loadSalesOrders();
+      } else {
+        this.loginError = 'Invalid PIN. Please try again.';
+        this.typedInPin = '';
+      }
+    },
+    formatDate(dateString) {
+      if (!dateString) {
+        return 'No due date set';
+      }
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    },
+    loadSalesOrders() {
+      const allSalesOrders = $getGrid('opportunities');
+      this.salesOrders = allSalesOrders;
+      return allSalesOrders;
+    },
+    selectSalesOrder(order) {
+      this.selectedSalesOrder = order;
+      this.loadWorkOrders(order.rowKey);
+      this.selectedWorkOrder = null;
+      this.operations = [];
+    },
+    logout() {
+      this.loggedIn = false;
+      this.loggedInEmployee = null;
+    },
+    deselectSalesOrder() {
+      this.selectedSalesOrder = null;
+      this.workOrders = [];
+      this.selectedWorkOrder = null;
+      this.operations = [];
+      this.workOrderSearch = '';
+    },
+    loadWorkOrders(salesOrderId) {
+      this.workOrders = $getGrid('opportunityLines')
+        .filter(wo => {
+          if (wo.salesOrder !== salesOrderId) return false;
+          return !wo.completed && wo.salesOrder == salesOrderId;
+        });
+    },
+    selectWorkOrder(workOrder) {
+      this.selectedWorkOrder = workOrder;
+      this.loadOperations(workOrder.rowKey);
+    },
+    deselectWorkOrder() {
+      this.selectedWorkOrder = null;
+      this.operations = [];
+      this.selectedPart = null;
+    },
+    loadOperations(workOrderId) {
+      this.operations = $getGrid('workOrderOperations').filter(op => op.workOrder === workOrderId);
+    },
+    async startOperation(operation) {
+      try {
+        await $dgSetRowVals('workOrderOperations', operation.rowKey, {
+          active: true,
+          currentEmployee: this.loggedInEmployee.rowKey
+        });
+
+        let checkActiveTimeCard = $getGrid('timeCards').find((f) => f.activeTimeCard);
+
+        if(checkActiveTimeCard) {
+          let newTimeEntry = await $dgAddRow('timeEntries', {
+            timeCards: checkActiveTimeCard.rowKey,
+            employee: this.loggedInEmployee.rowKey,
+            started: Date.now(),
+            workOrderOperation: operation.rowKey,
+            workOrder: operation.workOrder,
+          });
+        } else {
+          let newTimeCard = await $dgAddRow('timeCards', {
+            employee: this.loggedInEmployee.rowKey,
+            started: Date.now(),
+            activeTimeCard: true
+          });
+
+          let newTimeEntry = await $dgAddRow('timeEntries', {
+            timeCards: newTimeCard,
+            employee: this.loggedInEmployee.rowKey,
+            started: Date.now(),
+            workOrderOperation: operation.rowKey,
+            workOrder: operation.workOrder,
+          });
+        }
+
+        this.$bvToast.toast('Time entry created successfully', {
+          title: 'Success',
+          variant: 'success',
+          solid: true
+        });
+      } catch (error) {
+        console.error('Error starting operation:', error);
+        this.$bvToast.toast('Error starting operation', {
+          title: 'Error',
+          variant: 'danger',
+          solid: true
+        });
+      }
+    },
+    async stopOperation(operation) {
+      try {
+        await $dgSetRowVals('workOrderOperations', operation.rowKey, {
+          active: false,
+          currentEmployee: null
+        });
+        
+        const activeTimeEntry = $getGrid('timeEntries').find(
+          entry => entry.workOrderOperation === operation.rowKey && !entry.ended
+        );
+        
+        if (activeTimeEntry) {
+          await $dgSetRowVals('timeEntries', activeTimeEntry.rowKey, {
+            stopped: Date.now()
+          });
+        }
+        
+this.$bvToast.toast('Operation stopped successfully', {
+          title: 'Success',
+          variant: 'success',
+          solid: true
+        });
+      } catch (error) {
+        console.error('Error stopping operation:', error);
+        this.$bvToast.toast('Error stopping operation', {
+          title: 'Error',
+          variant: 'danger',
+          solid: true
+        });
+      }
+    },
+    canStartOperation(operation) {
+      if (operation.completed) return false;
+      const previousOperation = this.operations
+        .filter(op => op.sequence < operation.sequence)
+        .sort((a, b) => b.sequence - a.sequence)[0];
+      if (!previousOperation) return true;
+      return previousOperation.completed;
+    },
+  },
+};
+</script>
+
+<style scoped>
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+  }
+
+  .login-screen {
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+  }
+
+  .employee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .employee-card {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+
+  .employee-card:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+  }
+
+  .employee-name {
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+
+  .login-screen .error-message {
+    color: red;
+    margin-top: 10px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .header h2 {
+    color: #0056b3;
+  }
+
+  .sales-orders-section,
+  .work-orders-section,
+  .operations-section {
+    flex: 1;
+  }
+
+  .scrollable-container {
+    overflow-y: auto;
+    background-color: #ffffff;
+    padding: 10px;
+    border: 1px #e9ecef solid;
+    border-radius: 5px;
+    max-height: calc(100vh - 150px);
+  }
+
+  /* New styles for operations section */
+  .border-left-4 {
+    border-left-width: 4px !important;
+  }
+
+  .status-indicator {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .gap-3 {
+    gap: 1rem;
+  }
+
+  .font-monospace {
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
+  .font-weight-medium {
+    font-weight: 500;
+  }
+
+  /* Card transitions */
+  .card {
+    transition: box-shadow 0.2s ease-in-out;
+  }
+
+  .card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+
+  /* Keep existing styles for other sections */
+  .cards-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .cards-container {
+    background-color: #007bff;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: calc(33.333% - 10px);
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .cards-container:hover {
+    background-color: #0056b3;
+    transform: translateY(-5px);
+  }
+
+  .search-container b-form-input {
+    border: 1px solid #ccc;
+  }
+
+  .operation-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+      /* Add these to your existing styles */
+    .card-header .btn {
+      min-width: 42px; /* Ensures consistent button width */
+    }
+
+    /* Ensure text wraps properly */
+    .card-header small {
+      word-break: break-word;
+    }
+
+    /* Ensure operation name doesn't overflow */
+    .card-header h5 {
+      word-break: break-word;
+      max-width: calc(100% - 60px); /* Accounts for button width + margin */
+    }
+</style>

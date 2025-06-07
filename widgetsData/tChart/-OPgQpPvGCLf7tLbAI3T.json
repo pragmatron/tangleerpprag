@@ -1,0 +1,17 @@
+{
+  "chartName": "Orders Totals by Customer",
+  "chartType": "bar",
+  "groupBy": [
+    {
+      "column": "customer",
+      "key": "-OPgQpPvGCLf7tLbAI3S"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalOrderValue",
+      "key": "-OPgQpPu6EUr9b1Ka4Ha",
+      "operator": "sum"
+    }
+  ]
+}

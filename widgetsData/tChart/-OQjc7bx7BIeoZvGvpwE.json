@@ -1,0 +1,24 @@
+{
+  "chartName": "sales lins by month",
+  "chartType": "bar",
+  "colorPalette": {
+    "colorPalette": {
+      "label": "Rainbow",
+      "value": "rainbow"
+    }
+  },
+  "groupBy": [
+    {
+      "column": "$createdDate$MonthYear",
+      "key": "-OQjcAmgoemwkwx0J-AN"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalLineAmount",
+      "format": "$0.00",
+      "key": "-OQjcCAqW25Oi2a57hH4",
+      "operator": "sum"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/estimateOperations",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "estimateOperations"
+  },
+  "subtab": "-NpZnyzwOvVw8Eb-9ZXd",
+  "tab": "-NZl1GT89ekLN8eDvSEE",
+  "type": "DataGrid"
+}

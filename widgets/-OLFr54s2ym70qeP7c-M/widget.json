@@ -1,0 +1,18 @@
+{
+  "autoHeight": true,
+  "dependency": "groupedSummary/-OLFr6YFnM1YIi4RPa1o",
+  "gsOptions": {
+    "h": 8,
+    "w": 24,
+    "x": 0,
+    "y": 0
+  },
+  "layout": "b-card",
+  "overflow": "height: auto;",
+  "props": {
+    "groupedSummaryOptionsKey": "-OLFr6YFnM1YIi4RPa1o"
+  },
+  "subtab": "-OLFr3hTIllmho67bhTS",
+  "tab": "-NZl1GT89ekLN8eDvSEE",
+  "type": "GroupedSummary"
+}

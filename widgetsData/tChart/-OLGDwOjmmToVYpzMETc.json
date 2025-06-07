@@ -1,0 +1,17 @@
+{
+  "chartName": "Sales Orders by Customer",
+  "chartType": "bar",
+  "groupBy": [
+    {
+      "column": "soldToCustomer",
+      "key": "-OLGDwOih7YWo9D1W2E5"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "totalOrderCommission",
+      "key": "-OLGDwOih7YWo9D1W2E4",
+      "operator": "sum"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "container": "-OLEIk8ZVNG1tpfMHf3d",
+  "gsOptions": {
+    "h": 4,
+    "w": 24,
+    "x": 0,
+    "y": 0
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "quotes"
+  },
+  "subtab": "-NnmsKcNUmAqZF3LO6JU",
+  "tab": "-NZQQhYtGqKTbT0LahRT",
+  "type": "DataGrid"
+}

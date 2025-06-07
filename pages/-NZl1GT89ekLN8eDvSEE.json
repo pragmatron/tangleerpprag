@@ -1,0 +1,9 @@
+{
+  "expandedByDefault": false,
+  "icon": {
+    "color": "rgba(54, 162, 235, 1)",
+    "name": "wrench"
+  },
+  "order": 8,
+  "title": "Production"
+}

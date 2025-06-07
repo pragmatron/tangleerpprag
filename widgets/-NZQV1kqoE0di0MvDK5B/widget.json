@@ -1,0 +1,15 @@
+{
+  "dependency": "dataGrid/customers",
+  "gsOptions": {
+    "h": 6,
+    "w": 24
+  },
+  "layout": "b-card",
+  "overflow": "height: auto",
+  "props": {
+    "gridId": "customers"
+  },
+  "subtab": "-NZQV1hmHfUb4G3-cXAR",
+  "tab": "-Nr16kQdMyZP5X_9exWf",
+  "type": "DataGrid"
+}

@@ -1,0 +1,94 @@
+{
+  "data": {
+    "metaData": {
+      "id": "-OHlydnV5OU37UTgjO5l",
+      "statusField": ""
+    },
+    "nodes": [
+      {
+        "id": "node1738152784903",
+        "x": 255.238094329834,
+        "y": 453.54166303362166,
+        "name": "start-event",
+        "label": "Start Event",
+        "clazz": "startEvent",
+        "icon": {
+          "name": "flag",
+          "color": "hsl(154, 64%, 49%)"
+        },
+        "attachment": {},
+        "outcomes": [],
+        "customWidth": 250,
+        "customHeight": 60
+      },
+      {
+        "id": "node1738152786556",
+        "x": 730,
+        "y": 631,
+        "name": "script-task",
+        "label": "Fetch Methods",
+        "clazz": "scriptTask",
+        "icon": {
+          "name": "terminal",
+          "color": "hsl(218, 54%, 20%)"
+        },
+        "attachment": {},
+        "outcomes": [],
+        "customWidth": 250,
+        "customHeight": 60
+      },
+      {
+        "id": "node1738152788077",
+        "x": 1405.238094329834,
+        "y": 454.9702344621931,
+        "name": "end-event",
+        "label": "End Event",
+        "clazz": "endEvent",
+        "icon": {
+          "name": "stop-circle",
+          "color": "hsl(348, 91%, 59%)"
+        },
+        "attachment": {},
+        "outcomes": [],
+        "customWidth": 250,
+        "customHeight": 60
+      }
+    ],
+    "edges": [
+      {
+        "id": "df0fd8da-91d4-4378-9018-4021bded59bb",
+        "source": "node1738152784903",
+        "target": "node1738152786556",
+        "startSocket": "right",
+        "endSocket": "left",
+        "label": "Start Event",
+        "targetLabel": "Script Task",
+        "style": {}
+      },
+      {
+        "id": "c46f6fee-934f-423c-8a7c-ee8db5084838",
+        "source": "node1738152786556",
+        "target": "node1738152788077",
+        "startSocket": "right",
+        "endSocket": "left",
+        "label": "Script Task",
+        "targetLabel": "End Event",
+        "style": {}
+      }
+    ],
+    "transform": {
+      "x": 89.21211641410463,
+      "y": 141.6509254645317,
+      "scale": 0.2,
+      "isAnimated": false
+    },
+    "settings": {
+      "isWorkflowTransformationEnabled": true,
+      "isNodesAlignmentEnabled": true,
+      "workflowMode": "default",
+      "isCompact": false
+    }
+  },
+  "handleAsSingleScript": true,
+  "name": "fetchMethodMatsAndOpsForTree"
+}

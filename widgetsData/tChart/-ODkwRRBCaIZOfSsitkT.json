@@ -1,0 +1,19 @@
+{
+  "chartName": "Sales Orders by Customer",
+  "chartType": "pie",
+  "groupBy": [
+    {
+      "column": "soldToCustomer",
+      "key": "-ODkwRRBCaIZOfSsitkS"
+    }
+  ],
+  "maxResult": "5",
+  "metrics": [
+    {
+      "column": "totalQuoteLinePrice",
+      "key": "-ODkwRRBCaIZOfSsitkR",
+      "operator": "sum"
+    }
+  ],
+  "metricsSort": "DESC"
+}

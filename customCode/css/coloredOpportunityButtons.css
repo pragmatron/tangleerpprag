@@ -1,0 +1,23 @@
+
+
+/* New Priority Levels */
+a[aria-label*='Low'] {
+  background-color: #d1f0d1 !important; /* Light Blue */
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+a[aria-label*='Medium'] {
+  background-color: #fff6b2 !important; /* Orange */
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+a[aria-label*='High'] {
+  background-color: rgba(220, 20, 60, 0.5) !important; /* Red */
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+
+

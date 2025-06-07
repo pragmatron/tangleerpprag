@@ -1,0 +1,17 @@
+{
+  "chartName": "Work Orders Per Customer",
+  "chartType": "bar",
+  "groupBy": [
+    {
+      "column": "customer",
+      "key": "-OOYr-5TcaNFHuoVnsfR"
+    }
+  ],
+  "metrics": [
+    {
+      "column": "name",
+      "key": "-OOYqwyBX6R80ymwQ9u7",
+      "operator": "count"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+.sortable-inner-component {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.kanban-card:hover {
+  transform: scale(1.02);
+}
+
+.card-header {
+  margin-bottom: 10px;
+}
+
+.card-body-demo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem !important; 
+}
+
+.card-details-left {
+  flex: 1;
+}
+
+.card-details-left h5, 
+.card-details-left p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.card-details-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.employee-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.tools-icon {
+  font-size: 24px;
+  color: #555;
+}
